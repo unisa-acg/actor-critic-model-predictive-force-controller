@@ -5,6 +5,7 @@ import os.path
 from itertools import combinations
 
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import ion, show
 import mujoco_py
 import numpy as np
 import pandas as pd
@@ -17,6 +18,9 @@ class MujocoContactValidation:
         body_names = sim.model.body_names
         self.combinations_vect = [i for i in combinations(body_names, 2)]
         self.combinations_forces_vect = np.zeros(
+            (len(self.combinations_vect), steps), dtype=np.float64, order="C"
+        )
+        self.combinations_forces_built_in = np.zeros(
             (len(self.combinations_vect), steps), dtype=np.float64, order="C"
         )
         self.contact_forces_calls = 0
@@ -39,6 +43,8 @@ class MujocoContactValidation:
         d_vect = np.zeros(ncon, dtype=np.float64)
         k_vect = np.zeros(ncon, dtype=np.float64)
         aref_vect = np.zeros(njmax, dtype=np.float64)
+        c_array = np.zeros(6, dtype=np.float64)
+        f_normal_vect = np.zeros(ncon, dtype=np.int32)
 
         if ncon != 0:
 
@@ -48,12 +54,21 @@ class MujocoContactValidation:
             combinations_forces_vect = np.zeros(
                 len(combinations_vect), dtype=np.float64
             )
+            combinations_forces_built_in = np.zeros(
+                len(combinations_vect), dtype=np.float64
+            )
             if self.combinations_forces_vect.shape[0] != len(combinations_forces_vect):
                 self.combinations_forces_vect = np.zeros(
                     len(combinations_forces_vect), dtype=np.float64
                 )
                 self.combinations_forces_vect = np.transpose(
                     self.combinations_forces_vect
+                )
+                self.combinations_forces_built_in = np.zeros(
+                    len(combinations_forces_built_in), dtype=np.float64
+                )
+                self.combinations_forces_buil_in = np.transpose(
+                    self.combinations_forces_built_in
                 )
             contact_list_tuple = [0] * njmax
 
@@ -70,6 +85,10 @@ class MujocoContactValidation:
                 contact_list_tuple[efc_address] = geom_tuple
                 index_tuple = combinations_vect.index(geom_tuple)
                 counter_vect[index_tuple] += 1
+
+                # Retrieve also the contact forces with built-in functions for comparison
+                mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, c_array)
+                f_normal_vect[efc_address] = c_array[0]
 
             vel_njmax = data.efc_vel
 
@@ -130,10 +149,22 @@ class MujocoContactValidation:
                 combinations_forces_vect[ind_tuple] = (
                     combinations_forces_vect[ind_tuple] + contact_forces_vect[ind_efc]
                 )
+                # Do the same for forces retrieved via built-in functions
+                combinations_forces_built_in[ind_tuple] = (
+                    combinations_forces_built_in[ind_tuple]
+                    + contact_forces_vect[ind_efc]
+                )
 
             self.combinations_forces_vect[
                 :, self.contact_forces_calls
             ] = combinations_forces_vect
+
+            # ----------------------------------------------------------
+            # Store the forces with mujoco built in method to compare
+            self.combinations_forces_built_in[
+                :, self.contact_forces_calls
+            ] = combinations_forces_built_in
+
         self.contact_forces_calls += 1
 
     def plot_contact_forces(self):
@@ -147,7 +178,7 @@ class MujocoContactValidation:
             if not is_all_zero:
                 plt.figure()
                 str = " and ".join(self.combinations_vect[i])
-                plt.title(r"Contact force between " + str)
+                plt.title(r"Contact force between " + str + "(Explicit Method)")
                 plt.xlabel(r"Steps")
                 plt.ylabel(r"Total contact force $[N]$")
                 plt.grid()
@@ -156,8 +187,21 @@ class MujocoContactValidation:
                     self.combinations_forces_vect[i, 0 : self.contact_forces_calls],
                     linewidth=2,
                 )
+
+                plt.figure()
+                str = " and ".join(self.combinations_vect[i])
+                plt.title(r"Contact force between " + str + "(Built In Method)")
+                plt.xlabel(r"Steps")
+                plt.ylabel(r"Total contact force $[N]$")
+                plt.grid()
+                plt.plot(
+                    step_vect,
+                    self.combinations_forces_built_in[i, 0 : self.contact_forces_calls],
+                    linewidth=2,
+                )
+
         # TODO: solve issue where if plt.show() is called here, then the rest of the code won't execute until you close the figure
-        plt.show()
+        # plt.show()
 
     def contact_forces_to_csv(self, sim):
         """Given a MuJoCo Sim simulation prints all the contacts parameters and forces registered into a .csv file in the current location"""

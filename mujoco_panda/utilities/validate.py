@@ -44,7 +44,7 @@ class MujocoContactValidation:
         k_vect = np.zeros(ncon, dtype=np.float64)
         aref_vect = np.zeros(njmax, dtype=np.float64)
         c_array = np.zeros(6, dtype=np.float64)
-        f_normal_vect = np.zeros(ncon, dtype=np.int32)
+        f_normal_vect = np.zeros(ncon, dtype=np.float64)
 
         if ncon != 0:
 
@@ -137,7 +137,7 @@ class MujocoContactValidation:
 
             # Calc total contact forces vector
             f = inv_AR.dot(delta_a)
-            contact_forces_vect = f
+            contact_forces_vect = -f
 
             # Sum all the contact forces with respect to the pair of bodies in contact
             # Store the values in the class to be used by plot_contact_forces() method
@@ -151,8 +151,7 @@ class MujocoContactValidation:
                 )
                 # Do the same for forces retrieved via built-in functions
                 combinations_forces_built_in[ind_tuple] = (
-                    combinations_forces_built_in[ind_tuple]
-                    + contact_forces_vect[ind_efc]
+                    combinations_forces_built_in[ind_tuple] + f_normal_vect[ind_efc]
                 )
 
             self.combinations_forces_vect[
@@ -198,6 +197,7 @@ class MujocoContactValidation:
                     step_vect,
                     self.combinations_forces_built_in[i, 0 : self.contact_forces_calls],
                     linewidth=2,
+                    color="red",
                 )
 
         # TODO: solve issue where if plt.show() is called here, then the rest of the code won't execute until you close the figure

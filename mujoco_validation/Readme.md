@@ -5,7 +5,7 @@ To be added...
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary> <b> Table of Contents </b> <summary>
+  <summary> <b> Table of Contents </b> </summary>
   <ol>
     <li>
       <a href="#introduction">About The Project</a>
@@ -31,7 +31,6 @@ To be added...
 
 * [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Git
-  
    ```sh
    sudo apt install git
    ```

@@ -3,35 +3,21 @@
 
 To be added...
 
-<!-- TABLE OF CONTENTS -->
-<details>
-<summary>Table of Contents</summary>
-
-<ol>
-<li>
-    <a href="#introduction">About The Project</a>
-</li>
-<li>
-    <a href="#getting-started">Getting Started</a>
-    <ul>
-    <li><a href="#prerequisites">Prerequisites</a></li>
-    <li><a href="#install-mujoco-210">Install MuJoCo 2.1.0</a></li>
-    <li><a href="#install-mujoco-py">Install MuJoCo-Py</a></li>
-    </ul>
-</li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#list-of-packages">List of Packages</a></li>
-<li><a href="#component-repos">Component Repos</a></li>
-</ol>
-</details>
-
-<br/>
-
-
+<b>Table of Contents </b>
+1. <a href="#getting-started">Getting Started</a>
+   * <a href="#prerequisites">Prerequisites</a>
+   * <a href="#installmujoco">Install Mujoco</a>
+   * <a href="#installmujocopy">Install Mujoco-Py</a>
+2. <a href="#usage">Usage</a>
+3. <a href="#listofpackages">List of Packages</a>
+4. <a href="#componentrepos">Component Repos</a>
 
 # Getting Started
+This section explains how to setup the environment needed to launch the demos
 
-## Prerequisites
+<!-- ----------------------------------------------------------------------- -->
+
+## Prerequisites 
 
 * [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Git
@@ -40,6 +26,7 @@ To be added...
    ```
 
 ## Install MuJoCo 2.1.0
+<div id="installmujoco"></div>
 
 1. Download MuJoCo library from [MuJoCo website](https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz)
 2. Create a hidden folder:
@@ -67,6 +54,7 @@ To be added...
    ```
 
 ## Install MuJoCo-Py
+<div id="installmujocopy"></div>
 
 1. Create and activate a Conda environment for MuJoCo-Py:
    ```sh
@@ -106,6 +94,7 @@ To be added...
    ```
 
 # Usage
+<div id="usage"></div>
 
 To be added...
 
@@ -115,18 +104,20 @@ To be added...
 
 
 # List of Packages
-
+<div id="listofpackages"></div>
 | Package                                                                                                                                                  | Functionality description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [MuJoCo Validation](mujoco_validation) | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
 | [MuJoCo Panda](environment_identification/mujoco_panda) |  Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot   |
 
 
+
 # Component Repos
+<div id="componentrepos"></div>
 
 | Repo                                                                       | Functionality                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
 | [Mujoco Panda](https://github.com/justagist/mujoco_panda) | Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot |
 
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">Back to top</a>]</p>

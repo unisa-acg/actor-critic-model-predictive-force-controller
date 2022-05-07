@@ -5,26 +5,28 @@ To be added...
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary><b>Table of Contents</b></summary>
-  <ol>
-    <li>
-      <a href="#introduction">About The Project</a>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#install-mujoco-210">Install MuJoCo 2.1.0</a></li>
-        <li><a href="#install-mujoco-py">Install MuJoCo-Py</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#list-of-packages">List of Packages</a></li>
-    <li><a href="#component-repos">Component Repos</a></li>
-  </ol>
+<summary>Table of Contents</summary>
+<ol>
+<li>
+    <a href="#introduction">About The Project</a>
+</li>
+<li>
+    <a href="#getting-started">Getting Started</a>
+    <ul>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#install-mujoco-210">Install MuJoCo 2.1.0</a></li>
+    <li><a href="#install-mujoco-py">Install MuJoCo-Py</a></li>
+    </ul>
+</li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#list-of-packages">List of Packages</a></li>
+<li><a href="#component-repos">Component Repos</a></li>
+</ol>
 </details>
 
 <br/>
+
+
 
 # Getting Started
 

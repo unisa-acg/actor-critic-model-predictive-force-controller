@@ -6,6 +6,7 @@ To be added...
 <!-- TABLE OF CONTENTS -->
 <details>
 <summary>Table of Contents</summary>
+
 <ol>
 <li>
     <a href="#introduction">About The Project</a>
@@ -111,8 +112,7 @@ To be added...
 | Tutorial                                                                                                                                                  | Description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | [ROS–Unity Integration](tutorials/ros_unity_integration/README.md)                                                                                        | A set of component-level tutorials showing how to set up communication between ROS and Unity |
-| [URDF Importer](tutorials/urdf_importer/urdf_tutorial.md)                                                                                                 | Steps on using the Unity package for loading [URDF](http://wiki.ros.org/urdf) files          |
-| [**New!**] [Visualizations](https://github.com/Unity-Technologies/ROS-TCP-Connector/blob/main/com.unity.robotics.visualizations/Documentation~/README.md) | Usage instructions for adding visualizations for incoming and outgoing ROS messages          |
+
 
 # List of Packages
 

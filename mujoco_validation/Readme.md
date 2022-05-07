@@ -5,7 +5,7 @@ To be added...
 
 <!-- TABLE OF CONTENTS -->
 <details>
-  <summary> <b> Table of Contents </b> </summary>
+  <summary><b>Table of Contents</b></summary>
   <ol>
     <li>
       <a href="#introduction">About The Project</a>
@@ -23,6 +23,7 @@ To be added...
     <li><a href="#component-repos">Component Repos</a></li>
   </ol>
 </details>
+
 <br/>
 
 # Getting Started
@@ -39,14 +40,12 @@ To be added...
 
 1. Download MuJoCo library from [MuJoCo website](https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz)
 2. Create a hidden folder:
-
    ```sh
    mkdir /home/username/.mujoco
    ```
 
 3. Extract the MuJoCo downloaded library into the hidden folder `.mujoco`
 4. Add these lines to the `.bashrc` file:
-
    ```sh
    export LD_LIBRARY_PATH=/home/user_name/.mujoco/mujoco210/bin #substitute username with your username
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
@@ -54,13 +53,11 @@ To be added...
    ```
 
 5. Source the `.bashrc` file:
-
    ```sh
    source .bashrc
    ```
 
 6. Test the installation:
-
    ```sh
    cd ~/.mujoco/mujoco210/bin
    ./simulate ../model/humanoid.xml
@@ -69,14 +66,12 @@ To be added...
 ## Install MuJoCo-Py
 
 1. Create and activate a Conda environment for MuJoCo-Py:
-
    ```sh
    conda create --name mujoco_py python=3.8
    conda activate mujoco_py
    ```
 
 2. Install the required packages:
-
    ```sh
    sudo apt update
    sudo apt install patchelf
@@ -85,7 +80,6 @@ To be added...
    ```
 
 3. Clone the MuJoCo-Py repository and install the required pip packages:
-
    ```sh
    git clone https://github.com/openai/mujoco-py
    cd mujoco-py
@@ -96,7 +90,6 @@ To be added...
 
 4. Reboot your pc
 5. Activate the Conda virtual environment and install MuJoCo-Py:
-
    ```sh
    conda activate mujoco_py
    sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
@@ -104,7 +97,6 @@ To be added...
    ```
 
 6. Test the installation:
-
    ```sh
    cd examples
    python3 markers_demo.py

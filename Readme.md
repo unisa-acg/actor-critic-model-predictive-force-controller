@@ -2,6 +2,7 @@
 <div id="top"></div>
 
 This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought for students with the aim to provide an environment for the development of master theses projects and some research activities.
+
 <b>Table of Contents</b>
 
 * <a href="#getting-started">Getting Started</a>
@@ -100,7 +101,7 @@ To be added...
 
 | Demo                                                                                                                                                  | Description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Contact forces and info retrieval](demos/contact_info_retrieval/Readme.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
+| [Contact forces and info retrieval](/demos/contact_info_retrieval/)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velocity of deformation of the contact etc.) are stored in .csv file for later analysis |
 
 
 # List of Packages
@@ -108,8 +109,8 @@ To be added...
 
 | Package                                                                    | Functionality                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| MuJoCo Validation | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
-| MuJoCo Panda |  See <a href="#componentrepos">Component Repos</a> for more info   |
+| [MuJoCo Validation](/mujoco_validation/) | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
+| [MuJoCo Panda](/mujoco_panda/) |  See <a href="#componentrepos">Component Repos</a> for more info   |
 
 <!-- TODO: give link to each package folder -->
 

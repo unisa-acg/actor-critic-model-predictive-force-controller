@@ -101,7 +101,7 @@ To be added...
 
 | Demo                                                                                                                                                  | Description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Contact forces and info retrieval](environment_identification/demos/contact_info_retrieval/Readme.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
+| [Contact forces and info retrieval](/demos/contact_info_retrieval/Readme.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
 
 
 # List of Packages

@@ -3,14 +3,15 @@
 
 To be added...
 
-<b>Table of Contents </b>
-1. <a href="#getting-started">Getting Started</a>
-   * <a href="#prerequisites">Prerequisites</a>
-   * <a href="#installmujoco">Install Mujoco</a>
-   * <a href="#installmujocopy">Install Mujoco-Py</a>
-2. <a href="#usage">Usage</a>
-3. <a href="#listofpackages">List of Packages</a>
-4. <a href="#componentrepos">Component Repos</a>
+<b>Table of Contents</b>
+
+* <a href="#getting-started">Getting Started</a>
+  * <a href="#prerequisites">Prerequisites</a>
+  * <a href="#installmujoco">Install Mujoco</a>
+  * <a href="#installmujocopy">Install Mujoco-Py</a>
+* <a href="#usage">Usage</a>
+* <a href="#listofpackages">List of Packages</a>
+* <a href="#componentrepos">Component Repos</a>
 
 # Getting Started
 This section explains how to setup the environment needed to launch the demos
@@ -98,19 +99,20 @@ This section explains how to setup the environment needed to launch the demos
 
 To be added...
 
-| Tutorial                                                                                                                                                  | Description                                                                                  |
+| Demo                                                                                                                                                  | Description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [ROS–Unity Integration](tutorials/ros_unity_integration/README.md)                                                                                        | A set of component-level tutorials showing how to set up communication between ROS and Unity |
+| [Contact forces and info retrieval](demos/contact_info_retrieval/Readme_contact_info_retrieval.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
 
 
 # List of Packages
 <div id="listofpackages"></div>
-| Package                                                                                                                                                  | Functionality description                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [MuJoCo Validation](mujoco_validation) | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
-| [MuJoCo Panda](environment_identification/mujoco_panda) |  Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot   |
 
+| Package                                                                       | Functionality                                      |
+| :------------------------------------------------------------------------- | :------------------------------------------------- |
+| MuJoCo Validation | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
+| MuJoCo Panda |  See <a href="#componentrepos">Component Repos</a> for more info   |
 
+<!-- TODO: give link to each package folder -->
 
 # Component Repos
 <div id="componentrepos"></div>

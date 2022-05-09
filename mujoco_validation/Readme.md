@@ -6,9 +6,9 @@ To be added...
 <b>Table of Contents</b>
 
 * <a href="#getting-started">Getting Started</a>
-  * <a href="#prerequisites">Prerequisites</a>
-  * <a href="#installmujoco">Install Mujoco</a>
-  * <a href="#installmujocopy">Install Mujoco-Py</a>
+   * <a href="#prerequisites">Prerequisites</a>
+   * <a href="#installmujoco">Install Mujoco</a>
+   * <a href="#installmujocopy">Install Mujoco-Py</a>
 * <a href="#usage">Usage</a>
 * <a href="#listofpackages">List of Packages</a>
 * <a href="#componentrepos">Component Repos</a>
@@ -101,7 +101,7 @@ To be added...
 
 | Demo                                                                                                                                                  | Description                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Contact forces and info retrieval](demos/contact_info_retrieval/Readme_contact_info_retrieval.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
+| [Contact forces and info retrieval](demos/contact_info_retrieval/Readme.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
 
 
 # List of Packages

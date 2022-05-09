@@ -10,7 +10,7 @@ from mujoco_panda.controllers.torque_based_controllers import (
 )
 import matplotlib.pyplot as plt
 import logging
-from simple_exp import contact_forces_validation as validate
+import mujoco_validation.contact_forces_validation as validate
 
 # Model path
 MODEL_PATH = os.environ["MJ_PANDA_PATH"] + "/mujoco_panda/models/"

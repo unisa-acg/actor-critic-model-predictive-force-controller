@@ -8,7 +8,7 @@ from mujoco_py import load_model_from_xml, MjSim, MjViewer
 import matplotlib.pyplot as plt
 import time
 import math
-import contact_forces_validation as validate
+import mujoco_validation.contact_forces_validation as validate
 
 
 def load_model_start_sim():

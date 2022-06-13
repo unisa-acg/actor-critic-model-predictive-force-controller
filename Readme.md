@@ -66,7 +66,7 @@ This section explains how to setup the environment needed to launch the demos
 2. Install the required packages:
    ```sh
    sudo apt update
-   sudo apt install patchelf
+   sudo apt install patchelf gcc
    sudo apt install python3-dev build-essential libssl-dev libffi-dev libxml2-dev  
    sudo apt install libxslt1-dev zlib1g-dev libglew1.5 libglew-dev python3-pip
    ```

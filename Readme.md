@@ -94,6 +94,25 @@ This section explains how to setup the environment needed to launch the demos
    python3 markers_demo.py
    ```
 
+## Install Robosuite
+<div id="installrobosuite"></div>
+
+1. Activate the Conda virtual environment
+   ```sh
+   conda activate mujoco_py
+   ```
+
+2. Clone the Robosuite repository and install the required pip packages:
+   ```sh
+   git clone https://github.com/StanfordVL/robosuite.git
+   cd robosuite
+   pip3 install -r requirements.txt
+   ```
+3. Test the installation:
+   ```sh
+   python robosuite/demos/demo_random_action.py
+   ```
+
 # Usage
 <div id="usage"></div>
 

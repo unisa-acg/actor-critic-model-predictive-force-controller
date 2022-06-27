@@ -1,4 +1,5 @@
 #
+from cmath import sqrt
 import csv
 import math
 import os.path
@@ -35,6 +36,7 @@ class MujocoContactValidation:
     def __init__(self, sim, steps):
         self.ncalls = 0
         self.ncallspanda = 0
+        self.ncalls_force_mujocoenv = 0
         body_names = sim.model.body_names
         self.combinations_vect = [i for i in combinations(body_names, 2)]
         self.combinations_forces_vect = np.zeros(
@@ -46,6 +48,9 @@ class MujocoContactValidation:
         self.contact_forces_calls = 0
         self.steps = steps
         self.contact_forces_to_csv_call = 0
+        self.forces_vect_mujocoenv = np.zeros(
+            (6,steps), dtype=np.float64, order="C"
+        )
 
     # ---------------------------------------------------------------------------- #
     #                          Contact forces calculation                          #
@@ -111,7 +116,7 @@ class MujocoContactValidation:
         dist_njmax = np.zeros(njmax, dtype=np.float64)
         vel_njmax = np.zeros(njmax, dtype=np.float64)
         efc_address_vect = np.zeros(ncon, dtype=np.int32)
-        f_normal_vect = np.zeros(ncon, dtype=np.float64)
+        f_normal_vect = np.zeros(ncon, dtype=np.float64) 
 
         body_names = sim.model.body_names
         combinations_vect = [i for i in combinations(body_names, 2)]
@@ -179,7 +184,7 @@ class MujocoContactValidation:
             f_normal_vect,
         ]
 
-    # ------------------------------- Main function ------------------------------ #
+    # ------------------------------- Main functions ----------------------------- #
 
     def contact_forces(self, sim):
         """Given a MuJoCo mjSim simulation, returns the vector of contact forces, following the formula ``f = (A + R)^-1 * (aref - a0)``. Moreover, it stores the value to be plotted using ``plot_contact_forces()`` method``
@@ -251,6 +256,62 @@ class MujocoContactValidation:
             self.combinations_forces_vect,
             self.combinations_vect,
         ]
+
+    def contact_forces_mujocoenv(self,env,geom1_name,geom2_name):
+        """Substitute function to the heavy contact_forces(), which can slow down simulation times. It implements the built in methods to retrieve the forces even in presence of friction. Stores them in the class in order to plot them.
+
+        Args:
+            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
+            geom1_name, geom2_name: name of the geometries whose mutual contact you want to check
+        """
+
+        sim = env.sim
+        env.check_contact("sphere","table_collision")
+        
+        for i in range(sim.data.ncon):
+            contact = sim.data.contact[i]
+            if (sim.model.geom_id2name(contact.geom1) == geom1_name or sim.model.geom_id2name(contact.geom1) == geom2_name) and (sim.model.geom_id2name(contact.geom2) == geom1_name or sim.model.geom_id2name(contact.geom2) == geom2_name):
+                forces_vect = np.zeros(6, dtype=np.float64)
+                mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, forces_vect)
+                self.forces_vect_mujocoenv[:,self.ncalls_force_mujocoenv] = forces_vect
+
+        self.ncalls_force_mujocoenv +=1
+
+    def plot_contact_forces_mujocoenv(self):
+        """plot the forces directions and the total magnitude happened between the pair of bodies specified in ``contact_forces_mujocoenv()``. Must be called AFTER ``contact_forces_mujocoenv()`` method
+
+        Returns:
+            fig
+        """
+
+        fx = self.forces_vect_mujocoenv[2,0:self.ncalls_force_mujocoenv]
+        fy = self.forces_vect_mujocoenv[1,0:self.ncalls_force_mujocoenv]
+        fz = self.forces_vect_mujocoenv[0,0:self.ncalls_force_mujocoenv]
+        fxyz_sq = np.power(fx,2) + np.power(fy,2) + np.power(fz,2)
+        f_mag = np.power(fxyz_sq,0.5)
+        step_vect = np.arange(0,self.ncalls_force_mujocoenv,1)
+        fig, axs = plt.subplots(2, 2)
+        axs[0, 0].plot(step_vect, fx)
+        axs[0, 0].set_title('$F_x$')
+        axs[0,0].grid()
+        axs[0, 1].plot(step_vect, fy, 'tab:orange')
+        axs[0, 1].set_title('$F_y$')
+        axs[0,1].grid()
+        axs[1, 0].plot(step_vect, fz, 'tab:green')
+        axs[1, 0].set_title('$F_z$')
+        axs[1,0].grid()
+        axs[1, 1].plot(step_vect, f_mag, 'tab:red')
+        axs[1, 1].set_title('$F_{tot}$')
+        axs[1,1].grid()
+
+        for ax in axs.flat:
+            ax.set(xlabel='Steps', ylabel='$[N]$')
+
+        return axs
+        
+        
+
+
 
     # ---------------------------------------------------------------------------- #
     #              Plot contact forces (explicit and built in method)              #

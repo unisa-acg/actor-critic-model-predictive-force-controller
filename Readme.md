@@ -1,4 +1,4 @@
-# Introduction 
+# Introduction
 <div id="top"></div>
 
 This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought for students with the aim to provide an environment for the development of master theses projects and some research activities.
@@ -18,7 +18,7 @@ This section explains how to setup the environment needed to launch the demos
 
 <!-- ----------------------------------------------------------------------- -->
 
-## Prerequisites 
+## Prerequisites
 
 * [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Git
@@ -67,7 +67,7 @@ This section explains how to setup the environment needed to launch the demos
    ```sh
    sudo apt update
    sudo apt install patchelf gcc
-   sudo apt install python3-dev build-essential libssl-dev libffi-dev libxml2-dev  
+   sudo apt install python3-dev build-essential libssl-dev libffi-dev libxml2-dev
    sudo apt install libxslt1-dev zlib1g-dev libglew1.5 libglew-dev python3-pip
    ```
 
@@ -85,7 +85,7 @@ This section explains how to setup the environment needed to launch the demos
    ```sh
    conda activate mujoco_py
    sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
-   pip3 install -U 'mujoco-py<2.2,>=2.1' 
+   pip3 install -U 'mujoco-py<2.2,>=2.1'
    ```
 
 6. Test the installation:
@@ -244,6 +244,58 @@ When writing commit messages, please use the following conventions
 
 Use bullet lists for commits including more than one change. **See the latest commit messages for an example before making your first commit!**
 
+### Code Format Guidelines
+
+This repository follows [MoveIt Code Style Guidelines](https://moveit.ros.org/documentation/contributing/code/) for code formatting. As explained in this guide, you will need a few tools to format your code automatically.
+
+#### clang-format Auto Code Formatting
+
+First, install [`clang-format-10`](https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormat.html):
+
+```bash
+sudo apt install clang-format-10
+```
+
+`clang-format` requires [style options](https://releases.llvm.org/10.0.0/tools/clang/docs/ClangFormatStyleOptions.html), specified in the proper [configuration file](.clang-format), which contains the same options as [MoveIt one](https://github.com/ros-planning/moveit/blob/master/.clang-format).
+
+You could format a single file with:
+
+```bash
+clang-format-10 -i -style=file MY_ROS_NODE.cpp
+```
+
+Or format an entire directory recursively including subfolders:
+
+```bash
+find . -name '*.h' -or -name '*.hpp' -or -name '*.cpp' | xargs clang-format-10 -i -style=file $1
+```
+
+Anyway, it is recommended to use `pre-commit`, which will run `clang-format-10` automatically. The usage of this tool is explained in the next section.
+
+#### pre-commit Formatting Checks
+
+Once `clang-format` is installed, install [`pre-commit`](https://pre-commit.com/) too:
+
+```bash
+pip3 install pre-commit
+```
+
+You could run `pre-commit` over all the files in the repo manually:
+
+```bash
+pre-commit run -a
+```
+
+Anyway, it is recommended to always run `pre-commit` **automatically** before committing in a local repo, installing git hooks with the following command:
+
+```bash
+pre-commit install
+```
+
+The hooks that will be installed are specified in the proper [configuration file](.pre-commit-config.yaml): they will be launched everytime you run `git commit` on all the files you are committing.
+
+In addition to automatically format your code, the [flake8](https://flake8.pycqa.org/en/latest/) tool will raise warnings if some standards are not respected, forbidding you to commit files not compliant with those standards.
+
 ### Debug
 
 In order to acquire very basic information about integrating VSCode and ROS, visit [this page](https://medium.com/@tahsincankose/a-decent-integration-of-vscode-to-ros-4c1d951c982a). It is preparatory to understand the content of this section. In particular, the reader should know what a debug configuration in VSCode is and what pre-launch tasks are.
@@ -355,5 +407,3 @@ If you want to debug a plugin library, the process is the same, except that the 
 ```json
 "program": "/opt/ros/melodic/lib/moveit_ros_move_group/move_group"
 ```
-
-

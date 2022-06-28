@@ -1,4 +1,3 @@
-from cmath import sqrt
 import numpy as np
 import matplotlib.pyplot as plt
 from traj_utils.traj_gen import TrajectoryGenerator
@@ -12,6 +11,7 @@ old_time_step = 0.1
 new_time_step = 0.002
 
 #Trajectory generation
+
 #Trajectory data
 waypoints = [(0, 0), (0, 1), (0, 1), (1, 1), (2, 2)]
 traj_types = ['line', 'circle', 'line', 'sine_curve']
@@ -44,7 +44,8 @@ for i in range(traj_count):
 T.traj_res_csv(traj_count, traj_matrix, time, new_time_step)
 [dframe, traj_count] = T.read_traj_from_csv('traj_resampled.csv')
 
-t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1] - old_time_step, new_time_step)
+t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1] - old_time_step,
+                  new_time_step)
 
 for i in range(traj_count):
     traj_res = np.stack(
@@ -59,9 +60,9 @@ for i in range(traj_count):
     #Trajectory plotting
     fig = TG.plot_traj(x, y, traj_timestamps)
     fig2 = TG.plot_force_ref(f, traj_timestamps)
-    plt.figure(1+2*i)
-    plt.plot(traj_res[:,0], traj_res[:,1])
-    plt.figure(2+2*i)
-    plt.plot(t_dis, traj_res[:,2])
+    plt.figure(1 + 2 * i)
+    plt.plot(traj_res[:, 0], traj_res[:, 1])
+    plt.figure(2 + 2 * i)
+    plt.plot(t_dis, traj_res[:, 2])
 
 plt.show()

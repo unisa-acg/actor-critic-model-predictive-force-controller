@@ -8,33 +8,12 @@ from mujoco_panda.controllers.torque_based_controllers import (
     OSHybridForceMotionController, )
 import matplotlib.pyplot as plt
 import mujoco_validation.contact_forces_validation as validate
-
+import yaml
 # Model path
-MODEL_PATH = os.environ["MJ_PANDA_PATH"] + "/mujoco_panda/models/"
-
-# controller parameters
-KP_P = np.array([7000.0, 7000.0, 7000.0])
-KP_O = np.array([3000.0, 3000.0, 3000.0])
-ctrl_config = {
-    "kp_p": KP_P,
-    "kd_p": 2.0 * np.sqrt(KP_P),
-    "kp_o": KP_O,  # 10gains for orientation
-    "kd_o": [1.0, 1.0, 1.0],  # gains for orientation
-    "kp_f": [1.0, 1.0, 1.0],  # gains for force
-    "kd_f": [0.0, 0.0, 0.0],  # 25gains for force
-    "kp_t": [1.0, 1.0, 1.0],  # gains for torque
-    "kd_t": [0.0, 0.0, 0.0],  # gains for torque
-    "alpha": 3.14 * 0,
-    "use_null_space_control": True,
-    "ft_dir": [0, 0, 0, 0, 0, 0],
-    # newton meter
-    "null_kp": [5.0, 10.0, 5.0, 10.0, 5.0, 10.0, 5.0],
-    "null_kd": 0,
-    "null_ctrl_wt": 2.5,
-    "use_orientation_ctrl": True,
-    "linear_error_thr": 0.025,
-    "angular_error_thr": 0.01,
-}
+MODEL_PATH = os.path.join(os.environ["MJ_PANDA_PATH"], "mujoco_panda/models/")
+# Load controller config
+with open(r'ctrl_config.yaml') as file:
+    ctrl_config = yaml.full_load(file)
 
 if __name__ == "__main__":
 

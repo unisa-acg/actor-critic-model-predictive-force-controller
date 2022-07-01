@@ -1,15 +1,12 @@
 import os
 import time
-import mujoco_py
 import numpy as np
 from mujoco_panda import PandaArm
 from mujoco_panda.utils.viewer_utils import render_frame
 from mujoco_panda.utils.debug_utils import ParallelPythonCmd
 from mujoco_panda.controllers.torque_based_controllers import (
-    OSHybridForceMotionController,
-)
+    OSHybridForceMotionController, )
 import matplotlib.pyplot as plt
-import logging
 import mujoco_validation.contact_forces_validation as validate
 
 # Model path
@@ -42,91 +39,87 @@ ctrl_config = {
 if __name__ == "__main__":
 
     # Instantiate the panda model simulator
-    p = PandaArm(
+    panda_arm = PandaArm(
         model_path=MODEL_PATH + "panda_block_table.xml",
         render=True,
         compensate_gravity=False,
         smooth_ft_sensor=True,
     )
 
-    force_vect = np.array([50])
+    force_reference_z = 50  # reference force for force control
 
-    for force_index in range(force_vect.shape[0]):
+    panda_arm.set_neutral_pose()
+    panda_arm.step()
 
-        p.set_neutral_pose()
-        p.step()
+    # create controller instance with default controller gains
+    hybrid_force_controller = OSHybridForceMotionController(panda_arm,
+                                                            config=ctrl_config)
 
-        # create controller instance with default controller gains
-        ctrl = OSHybridForceMotionController(p, config=ctrl_config)
+    # --- define trajectory in position -----
+    curr_pos, curr_ori = panda_arm.ee_pose()
+    goal_pos = curr_pos.copy()
+    goal_pos[2] = 0.5
+    target_traj = np.linspace(curr_pos, goal_pos, 200)
+    target_ori = curr_ori
 
-        # --- define trajectory in position -----
-        curr_ee, curr_ori = p.ee_pose()
-        goal_pos_1 = curr_ee.copy()
-        goal_pos_1[2] = 0.5
-        goal_pos_1[0] += 0
-        goal_pos_1[1] -= 0
-        target_traj_1 = np.linspace(curr_ee, goal_pos_1, 200)
-        z_target = curr_ee[2]
-        target_traj = target_traj_1
-        target_ori = curr_ori
+    # activate controller
+    hybrid_force_controller.set_active(True)
 
-        ctrl.set_active(
-            True
-        )  # activate controller (simulation step and controller thread now running)
+    now_r = time.time()
+    i = 0
 
-        now_r = time.time()
-        i = 0
-        count = 0
+    # Instantiate the class to calculate the contact forces with explicit and built in method
+    contact_forces_validation = validate.MujocoContactValidation(
+        panda_arm.sim, target_traj.shape[0])
 
-        # Instantiate the class to calculate the contact forces with explicit and built in method
-        Validate = validate.MujocoContactValidation(p.sim, target_traj.shape[0])
+    while i < target_traj.shape[0]:
 
-        while i < target_traj.shape[0]:
+        # Get current robot end-effector pose
+        robot_pos, robot_ori = panda_arm.ee_pose()
 
-            # Get current robot end-effector pose
-            robot_pos, robot_ori = p.ee_pose()
+        elapsed_r = time.time() - now_r
 
-            elapsed_r = time.time() - now_r
+        # Render controller target and current ee pose using frames
+        render_frame(panda_arm.viewer, robot_pos, robot_ori)
+        render_frame(panda_arm.viewer,
+                     target_traj[i, :],
+                     target_ori,
+                     alpha=0.2)
 
-            # Render controller target and current ee pose using frames
-            render_frame(p.viewer, robot_pos, robot_ori)
-            render_frame(p.viewer, target_traj[i, :], target_ori, alpha=0.2)
+        #if i == 10:  # activate force control when the robot is near the table
+        hybrid_force_controller.change_ft_dir(
+            [1, 1, 1, 1, 1, 1])  # start force control along Z axis
+        hybrid_force_controller.set_goal(
+            target_traj[i, :],
+            target_ori,
+            goal_force=[0, 0, -force_reference_z],
+            goal_torque=[0, 0, 0],
+        )  # target force in cartesian frame
+        # else:
+        #     hybrid_force_controller.set_goal(target_traj[i, :], target_ori)
 
-            if i == 10:  # activate force control when the robot is near the table
-                ctrl.change_ft_dir(
-                    [1, 1, 1, 1, 1, 1]
-                )  # start force control along Z axis
-                ctrl.set_goal(
-                    target_traj[i, :],
-                    target_ori,
-                    goal_force=[0, 0, -force_vect[force_index]],
-                    goal_torque=[0, 0, 0],
-                )  # target force in cartesian frame
-            else:
-                ctrl.set_goal(target_traj[i, :], target_ori)
+        # --- If needed uncomment, it renders the visualization at a slower time rate ---
+        if elapsed_r >= 0.1:
+            i += 1  # change target less frequently compared to render rate
+            #print ("smoothed FT reading: ", p.get_ft_reading(pr=True))
+            now_r = time.time()
+        # -------------------------------------------------------------------------------
 
-            # --- If needed uncomment, it renders the visualization at a slower time rate ---
-            # if elapsed_r >= 0.1:
-            #     i += 1 # change target less frequently compared to render rate
-            #     #print ("smoothed FT reading: ", p.get_ft_reading(pr=True))
-            #     now_r = time.time()
-            # -------------------------------------------------------------------------------
+        panda_arm.render()  # render the visualisation
 
-            p.render()  # render the visualisation
+        contact_forces_validation.contact_forces(panda_arm.sim)
 
-            Validate.contact_forces(p.sim)
+        # Store results in csv file
+        contact_forces_validation.contact_forces_to_csv(panda_arm.sim)
 
-            # Store results in csv file
-            Validate.contact_forces_to_csv(p.sim)
+        i += 1
 
-            i += 1
+    hybrid_force_controller.set_active(False)
 
-        ctrl.set_active(False)
-
-    Validate.plot_contact_forces()
+    contact_forces_validation.plot_contact_forces()
 
     plt.show()
 
-    input("Trajectory complete. Hit Enter to deactivate controller")
-    ctrl.set_active(False)
-    ctrl.stop_controller_cleanly()
+    input("Trajectory completed. Hit Enter to deactivate controller")
+    hybrid_force_controller.set_active(False)
+    hybrid_force_controller.stop_controller_cleanly()

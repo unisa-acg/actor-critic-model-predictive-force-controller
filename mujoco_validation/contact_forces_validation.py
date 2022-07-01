@@ -1,7 +1,4 @@
-#
-from cmath import sqrt
 import csv
-import math
 import os.path
 from itertools import combinations
 
@@ -15,42 +12,34 @@ from click import prompt
 
 class MujocoContactValidation:
     """
-    Class that contains method to calculate, plot and store in a .csv the contact forces and info happening during the MuJoCo simulation
-
-    Methods
-    -------
-
-    * __init__(sim,steps): instantiate the variables need for the other methods
-
-    * contact_forces (sim): calculate the contact forces happened during the simulation by formula ``f = (A + R)^-1 * (aref - a0)``
-            * calc_delta_a(): calculate the (aref - a0) component
-            * calc_invAR(sim,efc_address_vect): calculate the (A+R)^-1 component
-
-    * plot_contact_forces(): after calling contact_forces() method, can plot the forces registered
-
-    * contact_forces_to_csv(sim): stores all the contact forces registered during the simulation into a .csv file in current location
-
-    * contact_forces_to_csv_single_contact(sim)
+    Class that contains methods to compute, plot and store in a .csv the contact forces and information happening during a MuJoCo simulation
     """
 
     def __init__(self, sim, steps):
+        """
+        Args:
+            sim (mjSim): MuJoCo simulator istance
+            steps: total steps of the simulation
+
+        Returns:
+            NDArray: (A+R)^-1 component
+        """
+
         self.ncalls = 0
         self.ncallspanda = 0
         self.ncalls_force_mujocoenv = 0
         body_names = sim.model.body_names
         self.combinations_vect = [i for i in combinations(body_names, 2)]
         self.combinations_forces_vect = np.zeros(
-            (len(self.combinations_vect), steps), dtype=np.float64, order="C"
-        )
+            (len(self.combinations_vect), steps), dtype=np.float64, order="C")
         self.combinations_forces_built_in = np.zeros(
-            (len(self.combinations_vect), steps), dtype=np.float64, order="C"
-        )
+            (len(self.combinations_vect), steps), dtype=np.float64, order="C")
         self.contact_forces_calls = 0
         self.steps = steps
         self.contact_forces_to_csv_call = 0
-        self.forces_vect_mujocoenv = np.zeros(
-            (6,steps), dtype=np.float64, order="C"
-        )
+        self.forces_vect_mujocoenv = np.zeros((6, steps),
+                                              dtype=np.float64,
+                                              order="C")
 
     # ---------------------------------------------------------------------------- #
     #                          Contact forces calculation                          #
@@ -69,7 +58,9 @@ class MujocoContactValidation:
             NDArray: (A+R)^-1 component
         """
 
-        M = np.ndarray(shape=(len(sim.data.qvel) ** 2,), dtype=np.float64, order="C")
+        M = np.ndarray(shape=(len(sim.data.qvel)**2, ),
+                       dtype=np.float64,
+                       order="C")
         mujoco_py.functions.mj_fullM(sim.model, M, sim.data.qM)
         M = np.reshape(M, (len(sim.data.qvel), len(sim.data.qvel)))
         J = sim.data.efc_J
@@ -80,15 +71,14 @@ class MujocoContactValidation:
         R = np.diag(sim.data.efc_R)
         AR = A + R
 
-        # Invert only the "active" part of the matrix, the rest is full of zeros and not of interest
-        AR_mod_efc[0 : max_efc + 1, 0 : max_efc + 1] = AR[
-            0 : max_efc + 1, 0 : max_efc + 1
-        ]
+        # Invert only the "active" part of the matrix,
+        # the rest is full of zeros and not of interest
+        AR_mod_efc[0:max_efc + 1, 0:max_efc + 1] = AR[0:max_efc + 1,
+                                                      0:max_efc + 1]
         inv_AR_efc = np.linalg.pinv(AR_mod_efc)
         inv_AR = np.zeros((sim.model.njmax, sim.model.njmax), dtype=np.float64)
-        inv_AR[0 : max_efc + 1, 0 : max_efc + 1] = inv_AR_efc[
-            0 : max_efc + 1, 0 : max_efc + 1
-        ]
+        inv_AR[0:max_efc + 1, 0:max_efc + 1] = inv_AR_efc[0:max_efc + 1,
+                                                          0:max_efc + 1]
 
         return inv_AR
 
@@ -116,27 +106,26 @@ class MujocoContactValidation:
         dist_njmax = np.zeros(njmax, dtype=np.float64)
         vel_njmax = np.zeros(njmax, dtype=np.float64)
         efc_address_vect = np.zeros(ncon, dtype=np.int32)
-        f_normal_vect = np.zeros(ncon, dtype=np.float64) 
+        f_normal_vect = np.zeros(ncon, dtype=np.float64)
 
         body_names = sim.model.body_names
         combinations_vect = [i for i in combinations(body_names, 2)]
         counter_vect = np.zeros(len(combinations_vect), dtype=np.float64)
-        combinations_forces_vect = np.zeros(len(combinations_vect), dtype=np.float64)
-        combinations_forces_built_in = np.zeros(
-            len(combinations_vect), dtype=np.float64
-        )
+        combinations_forces_vect = np.zeros(len(combinations_vect),
+                                            dtype=np.float64)
+        combinations_forces_built_in = np.zeros(len(combinations_vect),
+                                                dtype=np.float64)
 
-        if self.combinations_forces_vect.shape[0] != len(combinations_forces_vect):
+        if self.combinations_forces_vect.shape[0] != len(
+                combinations_forces_vect):
             self.combinations_forces_vect = np.zeros(
-                len(combinations_forces_vect), dtype=np.float64
-            )
-            self.combinations_forces_vect = np.transpose(self.combinations_forces_vect)
+                len(combinations_forces_vect), dtype=np.float64)
+            self.combinations_forces_vect = np.transpose(
+                self.combinations_forces_vect)
             self.combinations_forces_built_in = np.zeros(
-                len(combinations_forces_built_in), dtype=np.float64
-            )
+                len(combinations_forces_built_in), dtype=np.float64)
             self.combinations_forces_built_in = np.transpose(
-                self.combinations_forces_built_in
-            )
+                self.combinations_forces_built_in)
         contact_list_tuple = [0] * njmax
         # ---------------------------------------------------------------------------- #
 
@@ -155,7 +144,8 @@ class MujocoContactValidation:
             counter_vect[index_tuple] += 1
 
             # Retrieve also the contact forces with built-in functions for comparison
-            mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, c_array)
+            mujoco_py.functions.mj_contactForce(sim.model, sim.data, i,
+                                                c_array)
             f_normal_vect[efc_address] = c_array[0]
 
         vel_njmax = sim.data.efc_vel
@@ -164,7 +154,8 @@ class MujocoContactValidation:
 
         # Calc reference acceleration --- aref ---
         for k in range(len(k_vect)):
-            aref_vect[k] = -(k_vect[k] * dist_njmax[k] + b_vect[k] * vel_njmax[k])
+            aref_vect[k] = -(k_vect[k] * dist_njmax[k] +
+                             b_vect[k] * vel_njmax[k])
 
         # Calc unconstrained acceleration --- a0 ---
         qacc = sim.data.qacc_unc  # unconstrained acceleration in joint space (nv x 1)
@@ -232,22 +223,20 @@ class MujocoContactValidation:
                 contact_tuple = contact_list_tuple[ind_efc]
                 ind_tuple = combinations_vect.index(contact_tuple)
                 combinations_forces_vect[ind_tuple] = (
-                    combinations_forces_vect[ind_tuple] + contact_forces_vect[ind_efc]
-                )
+                    combinations_forces_vect[ind_tuple] +
+                    contact_forces_vect[ind_efc])
                 # Do the same for forces retrieved via built-in functions
                 combinations_forces_built_in[ind_tuple] = (
-                    combinations_forces_built_in[ind_tuple] + f_normal_vect[ind_efc]
-                )
+                    combinations_forces_built_in[ind_tuple] +
+                    f_normal_vect[ind_efc])
 
-            self.combinations_forces_vect[
-                :, self.contact_forces_calls
-            ] = combinations_forces_vect
+            self.combinations_forces_vect[:, self.
+                                          contact_forces_calls] = combinations_forces_vect
 
             # ----------------------------------------------------------
             # Store the forces with mujoco built in method to compare
-            self.combinations_forces_built_in[
-                :, self.contact_forces_calls
-            ] = combinations_forces_built_in
+            self.combinations_forces_built_in[:, self.
+                                              contact_forces_calls] = combinations_forces_built_in
 
         self.contact_forces_calls += 1
 
@@ -257,65 +246,67 @@ class MujocoContactValidation:
             self.combinations_vect,
         ]
 
-    def contact_forces_mujocoenv(self,env,geom1_name,geom2_name):
+    def contact_forces_mujocoenv(self, env, geom1_name, geom2_name):
         """Substitute function to the heavy contact_forces(), which can slow down simulation times. It implements the built in methods to retrieve the forces even in presence of friction. Stores them in the class in order to plot them.
 
         Args:
-            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
-            geom1_name, geom2_name: name of the geometries whose mutual contact you want to check
+            env: MuJoCo wrapped environment
+            geom1_name, geom2_name: name of the geometries whose mutual contact forces are computed
         """
 
         sim = env.sim
-        env.check_contact("sphere","table_collision")
-        
+
         for i in range(sim.data.ncon):
             contact = sim.data.contact[i]
-            if (sim.model.geom_id2name(contact.geom1) == geom1_name or sim.model.geom_id2name(contact.geom1) == geom2_name) and (sim.model.geom_id2name(contact.geom2) == geom1_name or sim.model.geom_id2name(contact.geom2) == geom2_name):
+            if (sim.model.geom_id2name(contact.geom1) == geom1_name
+                    or sim.model.geom_id2name(contact.geom1) == geom2_name
+                ) and (sim.model.geom_id2name(contact.geom2) == geom1_name
+                       or sim.model.geom_id2name(contact.geom2) == geom2_name):
                 forces_vect = np.zeros(6, dtype=np.float64)
-                mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, forces_vect)
-                self.forces_vect_mujocoenv[:,self.ncalls_force_mujocoenv] = forces_vect
+                mujoco_py.functions.mj_contactForce(sim.model, sim.data, i,
+                                                    forces_vect)
+                self.forces_vect_mujocoenv[:, self.
+                                           ncalls_force_mujocoenv] = forces_vect
 
-        self.ncalls_force_mujocoenv +=1
+        self.ncalls_force_mujocoenv += 1
 
     def plot_contact_forces_mujocoenv(self):
-        """plot the forces directions and the total magnitude happened between the pair of bodies specified in ``contact_forces_mujocoenv()``. Must be called AFTER ``contact_forces_mujocoenv()`` method
+        """Plot the forces along cartesian-space directions and the total magnitude happened between the pair of bodies specified in ``contact_forces_mujocoenv()``. Must be called AFTER ``contact_forces_mujocoenv()`` method
 
         Returns:
             fig
         """
 
-        fx = self.forces_vect_mujocoenv[2,0:self.ncalls_force_mujocoenv]
-        fy = self.forces_vect_mujocoenv[1,0:self.ncalls_force_mujocoenv]
-        fz = self.forces_vect_mujocoenv[0,0:self.ncalls_force_mujocoenv]
-        fxyz_sq = np.power(fx,2) + np.power(fy,2) + np.power(fz,2)
-        f_mag = np.power(fxyz_sq,0.5)
-        step_vect = np.arange(0,self.ncalls_force_mujocoenv,1)
-        fig, axs = plt.subplots(2, 2)
-        axs[0, 0].plot(step_vect, fx)
+        #Order of forces in forces_vect_mujocoenv is (z,y,x)
+        fx = self.forces_vect_mujocoenv[2, 0:self.ncalls_force_mujocoenv]
+        fy = self.forces_vect_mujocoenv[1, 0:self.ncalls_force_mujocoenv]
+        fz = self.forces_vect_mujocoenv[0, 0:self.ncalls_force_mujocoenv]
+        fxyz_sq = np.power(fx, 2) + np.power(fy, 2) + np.power(fz, 2)
+        f_mag = np.power(fxyz_sq, 0.5)
+        step_vect = np.arange(0, self.ncalls_force_mujocoenv, 1)
+
+        _, axs = plt.subplots(2, 2)
+
+        axs[0, 0].plot(step_vect, fx, 'tab:red')
         axs[0, 0].set_title('$F_x$')
-        axs[0,0].grid()
-        axs[0, 1].plot(step_vect, fy, 'tab:orange')
+        axs[0, 0].grid()
+
+        axs[0, 1].plot(step_vect, fy, 'tab:green')
         axs[0, 1].set_title('$F_y$')
-        axs[0,1].grid()
-        axs[1, 0].plot(step_vect, fz, 'tab:green')
+        axs[0, 1].grid()
+
+        axs[1, 0].plot(step_vect, fz, 'tab:blue')
         axs[1, 0].set_title('$F_z$')
-        axs[1,0].grid()
-        axs[1, 1].plot(step_vect, f_mag, 'tab:red')
+        axs[1, 0].grid()
+
+        axs[1, 1].plot(step_vect, f_mag, 'tab:orange')
         axs[1, 1].set_title('$F_{tot}$')
-        axs[1,1].grid()
+        axs[1, 1].grid()
 
         for ax in axs.flat:
             ax.set(xlabel='Steps', ylabel='$[N]$')
 
         return axs
-        
-        
-
-
-
-    # ---------------------------------------------------------------------------- #
-    #              Plot contact forces (explicit and built in method)              #
-    # ---------------------------------------------------------------------------- #
 
     def plot_contact_forces(self):
         """Plot the contact forces happened between all the pair of bodies that came in contact during the simulation. Must be called AFTER ``contact_forces()`` method"""
@@ -328,28 +319,29 @@ class MujocoContactValidation:
             if not is_all_zero:
                 plt.figure()
                 str = " and ".join(self.combinations_vect[i])
-                plt.title(r"Contact force between " + str + "(Explicit Method)")
+                plt.title(r"Contact force between " + str +
+                          " (Explicit Method)")
                 plt.xlabel(r"Steps")
                 plt.ylabel(r"Total contact force $[N]$")
                 plt.grid()
                 plt.plot(
                     step_vect,
-                    self.combinations_forces_vect[i, 0 : self.contact_forces_calls],
+                    self.combinations_forces_vect[i,
+                                                  0:self.contact_forces_calls],
                     linewidth=2,
                 )
 
                 plt.figure()
                 str = " and ".join(self.combinations_vect[i])
-                plt.title(r"Contact force between " + str + "(Built In Method)")
+                plt.title(r"Contact force between " + str +
+                          " (Built In Method)")
                 plt.xlabel(r"Steps")
                 plt.ylabel(r"Total contact force $[N]$")
                 plt.grid()
-                plt.plot(
-                    step_vect,
-                    self.combinations_forces_built_in[i, 0 : self.contact_forces_calls],
-                    linewidth=2,
-                    color="red",
-                )
+                plt.plot(step_vect,
+                         self.combinations_forces_built_in[
+                             i, 0:self.contact_forces_calls],
+                         linewidth=2)
 
         # TODO: solve issue where if plt.show() is called here, then the rest of the code won't execute until you close the figure
         # plt.show()
@@ -359,9 +351,8 @@ class MujocoContactValidation:
     # ---------------------------------------------------------------------------- #
 
     def contact_forces_to_csv(self, sim):
-        """Given a MuJoCo Sim simulation prints all
-        the contacts parameters and forces registered
-        into a .csv file in the current location
+        """Given a MuJoCo Sim simulation prints all the contacts parameters 
+        and forces registered into a .csv file in the current location
 
         Args:
             sim (mjSim): MuJoCo simulator instance at current timestep
@@ -371,7 +362,9 @@ class MujocoContactValidation:
         file_exists = os.path.exists("contact_data_simulation.csv")
         if (file_exists == False) and (self.ncalls == 0):
             print("---")
-            print("The 📄.csv file for the contacts data doesn't exists, creating it...")
+            print(
+                "The 📄.csv file for the contacts data doesn't exists, creating it..."
+            )
             open("contact_data_simulation.csv", "x")
             print("---")
             self.ncalls = 1
@@ -401,10 +394,10 @@ class MujocoContactValidation:
             lines = file.readlines()
             index_begin_contact_mjdata = lines.index("CONTACT\n")
             index_end_contact_mjdata = lines.index("EFC_TYPE\n")
-            contact_lines = lines[index_begin_contact_mjdata:index_end_contact_mjdata]
-            contact_lines[0] = (
-                contact_lines[0] + "Step " + str(self.contact_forces_to_csv_call)
-            )
+            contact_lines = lines[
+                index_begin_contact_mjdata:index_end_contact_mjdata]
+            contact_lines[0] = (contact_lines[0] + "Step " +
+                                str(self.contact_forces_to_csv_call))
 
         contact_forces_string = ["contact_forces"]
 
@@ -416,40 +409,42 @@ class MujocoContactValidation:
         # TODO: instead of geom 1 and geom 0 transform the names into the real names of the bodies
 
         if ncon != 0:
-            f = open("contact_data_simulation.csv", "a")
-            writer = csv.writer(f)
+            with open("contact_data_simulation.csv", "a") as f:
+                writer = csv.writer(f)
 
-            # populate list with lines that we want to exclude from contact structure
-            lines_to_exclude = ["exclude", "includemargin", "pos", "frame"]
+                # populate list with lines that we want to exclude from contact structure
+                lines_to_exclude = ["exclude", "includemargin", "pos", "frame"]
 
-            for i in range(len(contact_lines)):
-                linesplit = contact_lines[i].split()
+                for i in range(len(contact_lines)):
+                    line_split = contact_lines[i].split()
 
-                # exclude the line if present in list of exclusion
-                flag = any(x in linesplit for x in lines_to_exclude)
-                if flag == True:
-                    continue
+                    # exclude the line if present in list of exclusion
+                    flag = any(x in line_split for x in lines_to_exclude)
+                    if flag == True:
+                        continue
 
-                # add contact forces line to the structure to be written to file
-                if "dim" in linesplit:
-                    linesplit_check = contact_lines[i - 1].split()
-                    for k in range(ncon):
-                        if str(k) in linesplit_check[0]:
-                            index_contact = k
-                            contact_forces_array = np.zeros(6, dtype=np.float64)
+                    # add contact forces line to the structure to be written to file
+                    if "dim" in line_split:
+                        linesplit_check = contact_lines[i - 1].split()
+                        for k in range(ncon):
+                            if str(k) in linesplit_check[0]:
+                                index_contact = k
+                                contact_forces_array = np.zeros(
+                                    6, dtype=np.float64)
 
-                            mujoco_py.functions.mj_contactForce(
-                                model, data, index_contact, contact_forces_array
-                            )
+                                mujoco_py.functions.mj_contactForce(
+                                    model, data, index_contact,
+                                    contact_forces_array)
 
-                            for kk in range(len(contact_forces_array)):
-                                contact_forces_string.append(contact_forces_array[kk])
-                            writer.writerow(contact_forces_string)
-                            contact_forces_string = ["contact_forces"]
+                                for kk in range(len(contact_forces_array)):
+                                    contact_forces_string.append(
+                                        contact_forces_array[kk])
+                                writer.writerow(contact_forces_string)
+                                contact_forces_string = ["contact_forces"]
 
-                    writer.writerow(linesplit)
-                else:
-                    writer.writerow(linesplit)
+                        writer.writerow(line_split)
+                    else:
+                        writer.writerow(line_split)
 
             f.close()
 
@@ -464,7 +459,10 @@ class MujocoContactValidation:
         if (file_exists == False) and (self.ncallspanda == 0):
             f = open("contact_information_panda.csv", "x")
             writer = csv.writer(f)
-            header = ["Penetration", "Velocity of deformation", "Contact force", "Ncon"]
+            header = [
+                "Penetration", "Velocity of deformation", "Contact force",
+                "Ncon"
+            ]
             writer.writerow(header)
             f.close()
             self.ncallspanda = 1
@@ -474,7 +472,10 @@ class MujocoContactValidation:
             os.remove("contact_information_panda.csv")
             f = open("contact_information_panda.csv", "x")
             writer = csv.writer(f)
-            header = ["Penetration", "Velocity of deformation", "Contact force", "Ncon"]
+            header = [
+                "Penetration", "Velocity of deformation", "Contact force",
+                "Ncon"
+            ]
             writer.writerow(header)
             f.close()
             self.ncallspanda = 1
@@ -490,7 +491,8 @@ class MujocoContactValidation:
             efc_address = data.contact[0].efc_address
             dist = data.active_contacts_efc_pos[efc_address]
             vel = data.efc_vel[efc_address]
-            mujoco_py.functions.mj_contactForce(model, data, 0, contact_forces_array)
+            mujoco_py.functions.mj_contactForce(model, data, 0,
+                                                contact_forces_array)
         else:
             dist = 0
             vel = 0
@@ -500,5 +502,3 @@ class MujocoContactValidation:
         with open("contact_information_panda.csv", "a") as file:
             writer = csv.writer(file)
             writer.writerow(data_to_be_written)
-
-        return

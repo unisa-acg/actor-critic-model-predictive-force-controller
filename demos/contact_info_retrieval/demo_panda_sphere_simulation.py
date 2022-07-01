@@ -72,7 +72,7 @@ if __name__ == "__main__":
     contact_forces_validation = validate.MujocoContactValidation(
         panda_arm.sim, target_traj.shape[0])
 
-    while i < target_traj.shape[0]:
+    for waypoint in target_traj:
 
         # Get current robot end-effector pose
         robot_pos, robot_ori = panda_arm.ee_pose()
@@ -81,28 +81,22 @@ if __name__ == "__main__":
 
         # Render controller target and current ee pose using frames
         render_frame(panda_arm.viewer, robot_pos, robot_ori)
-        render_frame(panda_arm.viewer,
-                     target_traj[i, :],
-                     target_ori,
-                     alpha=0.2)
+        render_frame(panda_arm.viewer, waypoint, target_ori, alpha=0.2)
 
-        #if i == 10:  # activate force control when the robot is near the table
         hybrid_force_controller.change_ft_dir(
             [1, 1, 1, 1, 1, 1])  # start force control along Z axis
         hybrid_force_controller.set_goal(
-            target_traj[i, :],
+            waypoint,
             target_ori,
             goal_force=[0, 0, -force_reference_z],
             goal_torque=[0, 0, 0],
         )  # target force in cartesian frame
-        # else:
-        #     hybrid_force_controller.set_goal(target_traj[i, :], target_ori)
 
         # --- If needed uncomment, it renders the visualization at a slower time rate ---
-        if elapsed_r >= 0.1:
-            i += 1  # change target less frequently compared to render rate
-            #print ("smoothed FT reading: ", p.get_ft_reading(pr=True))
-            now_r = time.time()
+        # if elapsed_r >= 0.1:
+        #     i += 1  # change target less frequently compared to render rate
+        #     #print ("smoothed FT reading: ", p.get_ft_reading(pr=True))
+        #     now_r = time.time()
         # -------------------------------------------------------------------------------
 
         panda_arm.render()  # render the visualisation
@@ -111,8 +105,6 @@ if __name__ == "__main__":
 
         # Store results in csv file
         contact_forces_validation.contact_forces_to_csv(panda_arm.sim)
-
-        i += 1
 
     hybrid_force_controller.set_active(False)
 

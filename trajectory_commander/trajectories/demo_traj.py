@@ -1,12 +1,14 @@
-from cmath import sqrt
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from traj_gen import TrajectoryGenerator
 from traj_resampler import TrajectoryResampler
 import randomizer as R
+import os
+from datetime import datetime
 
 TG = TrajectoryGenerator()
-T = TrajectoryResampler()
+TR = TrajectoryResampler()
 
 num_traj = 4
 old_time_step = 0.1
@@ -16,7 +18,9 @@ for i in range(num_traj):
     #Trajectory parameters randomization
     params_randomizer = {
         'starting_point': (0, 0),
-        "operating_zone_points": [(-0.25, -0.25), (0.25, 0.25)],  # il primo è y il secondo x
+        "operating_zone_points":
+        [(-0.25, -0.25),
+         (0.25, 0.25)],  # first element of tuple is y, the second one x
         'max_n_subtraj': 5,
         'max_vel': 3,
         'max_radius': 0.1,
@@ -26,36 +30,44 @@ for i in range(num_traj):
         'min_f_ref': 10,
         'max_f_ref': 80
     }
-    waypoints, traj_timestamps, traj_types, traj_params, force_reference_types, force_reference_parameters = R.traj_randomizer(params_randomizer)
+    waypoints, traj_timestamps, traj_types, traj_params, force_reference_types, force_reference_parameters = R.traj_randomizer(
+        params_randomizer)
 
     #Trajectory generation
-    [x, y, f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
-                            force_reference_types, force_reference_parameters)
+    [x, y,
+     f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
+                      force_reference_types, force_reference_parameters)
 
-    TG.print_to_csv('csv_folder/traj_gen_{}.csv'.format(i))
+    now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    csv_dir_path = 'Robosuite/example_traj_{}'.format(now)
+    csv_name = 'traj_gen_{}.csv'.format(i)
+    TG.print_to_csv(csv_name, csv_dir_path)
 
     time = np.arange(traj_timestamps[0], traj_timestamps[-1], old_time_step)
 
-    traj_matrix = T.read_traj_from_csv('csv_folder/traj_gen_{}.csv'.format(i))
+    traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 
     #Trajectory resampling
-    T.interp_traj(traj_matrix, time, new_time_step)
-    T.traj_res_csv('csv_folder/traj_res_{}.csv'.format(i))
-    traj_res = T.read_traj_from_csv('csv_folder/traj_res_{}.csv'.format(i))
+    TR.interp_traj(traj_matrix, time, new_time_step)
+    csv_res_name = 'traj_res_{}.csv'.format(i)
+    csv_res_path = os.path.join(csv_dir_path, csv_res_name)
+    TR.traj_res_csv(csv_res_path)
+    traj_res = TR.read_traj_from_csv(csv_res_path)
 
-    t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1] - old_time_step, new_time_step)
+    t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1] - old_time_step,
+                      new_time_step)
 
     #Trajectory plotting
-    fig = TG.plot_traj(x, y, traj_timestamps, params_randomizer)
+    fig = TG.plot_traj(x, y, params_randomizer)
 
     fig2 = TG.plot_force_ref(f, traj_timestamps)
 
-    plt.figure(1+2*i)
-    plt.plot(traj_res[:,0], traj_res[:,1], label='Resampled')
+    plt.figure(1 + 2 * i)
+    plt.plot(traj_res[:, 0], traj_res[:, 1], label='Resampled')
     plt.legend()
 
-    plt.figure(2+2*i)
-    plt.plot(t_dis, traj_res[:,2], label='Resampled')
+    plt.figure(2 + 2 * i)
+    plt.plot(t_dis, traj_res[:, 2], label='Resampled')
     plt.legend()
 
 plt.show()

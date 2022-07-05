@@ -1,9 +1,7 @@
-#!/usr/bin/env python
 import mujoco_py
-import numpy as np
 from mujoco_py import MjViewer
 import matplotlib.pyplot as plt
-import mujoco_validation.contact_forces_validation as validate
+import mujoco_validation.src.contact_forces_validation as validate
 
 
 def start_simulation(model_path):
@@ -28,7 +26,7 @@ if __name__ == "__main__":
     steps = 600
 
     # Load the model and make a simulator
-    model_path = 'demos/contact_info_retrieval/sphere_plane.xml'
+    model_path = 'mujoco_validation/demos/sphere_plane.xml'
     [sim, viewer] = start_simulation(model_path)
 
     # Import the class with the functions needed
@@ -43,7 +41,7 @@ if __name__ == "__main__":
         contact_forces_validation.contact_forces(sim)
 
         # Store results in csv file
-        contact_forces_validation.contact_forces_to_csv(sim)
+        contact_forces_validation.contact_forces_to_csv(sim, 'contact_data_simulation')
 
     # Plot contact forces retrieved by explicit method and explicit method
     contact_forces_validation.plot_contact_forces()

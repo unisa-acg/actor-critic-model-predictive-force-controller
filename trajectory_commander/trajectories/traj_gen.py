@@ -6,51 +6,43 @@ import os.path
 
 class TrajectoryGenerator():
     """
-    Class that contains method to generate, plot and save on a .csv file a trajectory given the parameters described in ``traj_gen()`` and and a trend of reference forces. 
+    Class that contains method to generate, plot and save on a .csv file a trajectory given the parameters described in ``traj_gen()`` and a trend of reference forces. 
     The data are stored in a folder selected by the user.
-
-    Methods
-    -------
-    * __init__(): instantiate the variables need for the other methods
-
-    * traj_gen(self, waypoints: list, traj_types: list,
-                 traj_parameters: list, traj_timestamps: list,
-                 force_ref_types: list, force_ref_params: list):
-        It generates the trajectory consistently with the input lists.
-        It exploits the subfunction ``_line()``, ``_circle()`` and ``_sine_curve()``
-
-    * plot_traj(param_randomizer): after calling ``traj_gen()`` method, it plots the points of the generated trajectory and the operative space
-
-    * plot_traj(param_randomizer): after calling ``traj_gen()`` method, it plots the points of the generated force reference
-
-    * print_to_csv(csv_file_path): after calling ``traj_gen()`` method, stores all the generated trajectory into a .csv file in the specified folder
     """
 
-    def __init__(self):
-        self.ts = 0.1
-        self.ncalls = 0
+    def __init__(self, timestep=0.1):
+        """
+        Assign default timestep
+        """
+        self.ts = timestep
+
+    # ---------------------------------------------------------------------------- #
+    # Trajectory generation section
 
     def traj_gen(self, waypoints: list, traj_types: list,
                  traj_parameters: list, traj_timestamps: list,
                  force_ref_types: list, force_ref_params: list):
-        """
-            Supported types:
+        """Generate a trajectory made by sub-trajectory of different types.
+
+        Supported parameters:
             - Trajectory types: 
-                'line','circle','sine_curve'
+                `line`,`circle`,`sine_curve`
 
             - Trajectory parameters:
-                - 'line': None
-                - 'circle': [radius]
-                - 'sine_curve': [amplitude,frequency]
+                - `line`: None
+                - `circle`: [radius]
+                - `sine_curve`: [amplitude,frequency]
 
             - Force reference types: 
-                'cnst','ramp'
+                `cnst`,`ramp`
 
             - Force reference parameters:
-                - 'cnst': value
-                - 'ramp': [initial value,final value] 
-        """
+                - `cnst`: value
+                - `ramp`: [initial value,final value] 
 
+        Returns:
+            [x,y,f]: 
+        """
         x_traj = []
         y_traj = []
         f_ref_traj = []
@@ -104,6 +96,17 @@ class TrajectoryGenerator():
         return [x_traj, y_traj, f_ref_traj]
 
     def _line(self, xi, xf, ts, t_tot):
+        """Generate a circle sub-trajectory
+
+        Args:
+            xi (tuple): initial point of the line
+            xf (tuple): final point of the line
+            ts (float): timestep for the trajectory generation
+            t_tot (float): total duration of the trajectory
+
+        Returns:
+            [x,y]: vectors containing x and y points of the trajectory
+        """
         if (xi == xf):
             raise Exception('Final point and initial point must be different')
 
@@ -124,6 +127,18 @@ class TrajectoryGenerator():
         return [x, y]
 
     def _circle(self, xi, xf, ts, t_tot, r):
+        """Generate a circle sub-trajectory
+
+        Args:
+            xi (tuple): initial point of the circle
+            xf (tuple): final point of the circle
+            ts (float): timestep for the trajectory generation
+            t_tot (float): total duration of the trajectory
+            r (float): radius of the circle
+
+        Returns:
+            [x,y]: vectors containing x and y points of the trajectory
+        """
         if (xi[0] != xf[0]) and (xi[1] != xf[1]):
             raise Exception('Final point and initial point must be equal')
 
@@ -145,6 +160,19 @@ class TrajectoryGenerator():
         return [x, y]
 
     def _sine_curve(self, xi, xf, ts, t_tot, ampl, freq):
+        """Generate a sine sub-trajectory
+
+        Args:
+            xi (tuple): initial point of the sine wave
+            xf (tuple): final point of the sine wave
+            ts (float): timestep for the trajectory generation
+            t_tot (float): total duration of the trajectory
+            ampl (float): amplitude of the sine wave
+            freq (int): frequency of the sine wave
+
+        Returns:
+            [x,y]: vectors containing x and y points of the trajectory
+        """
         if (xi[0] == xf[0]) and (xi[1] == xf[1]):
             raise Exception('Final point and initial point must be different')
         if (isinstance(freq, int)) != True:
@@ -155,14 +183,11 @@ class TrajectoryGenerator():
 
         n_points = round(t_tot / ts)
 
-        x = np.linspace(0, 1, n_points)
-
-        y = sin_eq(x * 2 * np.pi)
-
         x = np.linspace(0, np.sqrt((xf[0] - xi[0])**2 + (xf[1] - xi[1])**2),
                         n_points)
-        
-        # sine rotation
+        y = sin_eq(np.linspace(0, 1, n_points) * 2 * np.pi)
+
+        # Sine rotation
         m = (xf[1] - xi[1]) / (xf[0] - xi[0])
 
         if ((xf[0] - xi[0] < 0)):
@@ -179,31 +204,37 @@ class TrajectoryGenerator():
         return [x_rot, y_rot]
 
     # ---------------------------------------------------------------------------- #
+    # Plot section
 
     def plot_traj(self, x, y, params_randomizer):
-        """After calling ``traj_gen()`` method, it plots the points of the generated trajectory and the operative space
+        """After calling ``traj_gen()`` method, it plots the points of the generated trajectory in the operative space
+
+        Args:
+            x (NDArray): vector of x positions 
+            y (NDArray): vector of y positions 
+            traj_timestamps (dict): dictionary containing the parameter for trajectory generation
         
         Returns:
-            fig
+            Figure: xy-plane trajectory plot
         """
         fig = plt.figure()
         plt.plot(x, y, 'ro', linewidth=2, label='Generated')
         plt.plot(params_randomizer['operating_zone_points'][0][1],
-            params_randomizer['operating_zone_points'][0][0],
-            '*',
-            markersize=15)
+                 params_randomizer['operating_zone_points'][0][0],
+                 '*',
+                 markersize=15)
         plt.plot(params_randomizer['operating_zone_points'][0][1],
-            -params_randomizer['operating_zone_points'][0][0],
-            '*',
-            markersize=15)
+                 -params_randomizer['operating_zone_points'][0][0],
+                 '*',
+                 markersize=15)
         plt.plot(params_randomizer['operating_zone_points'][1][1],
-            params_randomizer['operating_zone_points'][1][0],
-            '*',
-            markersize=15)
+                 params_randomizer['operating_zone_points'][1][0],
+                 '*',
+                 markersize=15)
         plt.plot(params_randomizer['operating_zone_points'][1][1],
-            -params_randomizer['operating_zone_points'][1][0],
-            '*',
-            markersize=15)
+                 -params_randomizer['operating_zone_points'][1][0],
+                 '*',
+                 markersize=15)
         plt.xlabel('$x$')
         plt.ylabel('$y$')
         plt.title('$Position \; reference$')
@@ -211,13 +242,16 @@ class TrajectoryGenerator():
         return fig
 
     def plot_force_ref(self, f_ref, traj_timestamps):
-        """After calling ``traj_gen()`` method, it plots the points of the generated force reference
-        
+        """After calling `traj_gen()` method, it plots the points of the generated force reference
+
+        Args:
+            f_ref (NDArray): vector of reference forces 
+            traj_timestamps (NDArray): vector of timestamps
+
         Returns:
-            fig
+            Figure: force reference plot
         """
-        t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1],
-                          self.ts)
+        t_dis = np.arange(traj_timestamps[0], traj_timestamps[-1], self.ts)
         fig = plt.figure()
         plt.plot(t_dis, f_ref, 'ro', linewidth=2, label='Generated')
         plt.xlabel('$Time$')
@@ -227,46 +261,31 @@ class TrajectoryGenerator():
         return fig
 
     # ---------------------------------------------------------------------------- #
-    #                       Save trajectories informations to csv                  #
-    # ---------------------------------------------------------------------------- #
+    # CSV section
 
-    def print_to_csv(self, csv_file_path, keep_traj = False):
-        """Prints all the trajectories into a .csv file in the csv_file_path location """
+    def print_to_csv(
+        self,
+        csv_name,
+        csv_dir_path,
+    ):
+        """Prints the trajectory generated into a csv file in the `csv_file_path` location 
 
-        if keep_traj == False:
-            keep = "n"
+        Args:
+            csv_name (string): name of the csv file
+            csv_file_path (string): path of the csv file
+        """
 
-        # Check if file .csv exists or not, ask the user to keep it and append to it or replace it
-        file_exists = os.path.exists(csv_file_path)
-        if (file_exists == False) and (self.ncalls == 0):
-            print("---")
-            print(
-                "The 📄.csv file for the trajectories data doesn't exists, creating it..."
-            )
-            open(csv_file_path, "a")
-            print("---")
-            #self.ncalls = 1
+        csv_full_path = os.path.join(csv_dir_path, csv_name)
 
-        if (file_exists == True) and (self.ncalls == 0):
-            print("---")
-            if keep_traj != False:
-                keep = input(
-                    "The 📄.csv file for the trajectories data already exists, do you want to keep it? [y/n] "
-                )
-            if keep == "n":
-                print("File 📄.csv replaced")
-                os.remove(csv_file_path)
-                open(csv_file_path, "a")
-            print("---")
-            #self.ncalls = 1
+        # Check if directory exists, otherwise create it
+        if not os.path.isdir(csv_dir_path):
+            os.makedirs(csv_dir_path)
 
-        csv_f = open(csv_file_path, 'a')
-        writer = csv.writer(csv_f)
-        
-        header = ['x', 'y', 'f']
-        trajectory = np.stack((self.x_traj_tot, self.y_traj_tot, self.f_ref_tot), axis=-1)
-
-        writer.writerow(header)
-        writer.writerows(trajectory)
-
-        csv_f.close()
+        # Write the trajectory to the csv
+        with open(csv_full_path, "a") as f:
+            writer = csv.writer(f)
+            header = ['x', 'y', 'f']
+            trajectory = np.stack(
+                (self.x_traj_tot, self.y_traj_tot, self.f_ref_tot), axis=-1)
+            writer.writerow(header)
+            writer.writerows(trajectory)

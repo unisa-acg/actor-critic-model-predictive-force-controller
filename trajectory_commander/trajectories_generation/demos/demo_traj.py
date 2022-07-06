@@ -1,9 +1,9 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from traj_gen import TrajectoryGenerator
-from traj_resampler import TrajectoryResampler
-import randomizer as R
+from trajectory_commander.trajectories_generation.src.traj_gen import TrajectoryGenerator
+from trajectory_commander.trajectories_generation.src.traj_resampler import TrajectoryResampler
+import trajectory_commander.trajectories_generation.src.randomizer as R
 import os
 from datetime import datetime
 

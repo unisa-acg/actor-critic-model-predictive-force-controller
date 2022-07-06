@@ -329,7 +329,7 @@ class MujocoContactValidation:
 
         if ncon != 0:
             #with open("contact_data_simulation.csv", "a") as f:
-            with open("mujoco_validation/demos/output/{}_{}.csv".format(csv_name, 
+            with open("mujoco_validation/output/{}_{}.csv".format(csv_name, 
                                                             self.date_time), "a") as f:
                 writer = csv.writer(f)
 

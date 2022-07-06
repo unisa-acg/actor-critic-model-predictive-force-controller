@@ -6,14 +6,16 @@ from scipy.interpolate import interp1d
 
 class TrajectoryResampler:
     """
-    Class that contains method to resample and plot the trajectories from a trajectory matrix previously generated
+    Class that contains method to resample and plot the trajectories from a 
+    trajectory matrix previously generated
     """
 
     def __init__(self):
         self.ncalls = 0
 
     def interp_traj(self, traj_matrix, time, new_time_step=0.002):
-        """Resamples the trajectory `traj_matrix`, given a vector of sample times `time`, with a chosen time step `new_time_step` (default = 0.002). 
+        """Resamples the trajectory `traj_matrix`, given a vector of sample times 
+        `time`, with a chosen time step `new_time_step` (default = 0.002). 
 
         Args:
             traj_matrix (NDArray): 2D trajectory matrix
@@ -21,7 +23,8 @@ class TrajectoryResampler:
             new_time_step (float, optional): new time step for resampling. Defaults to 0.02.
             
         Returns:
-            [resampled_df, data_frame]: returns the resampled data frame and the data frame constructed from the original trajectory `[Resampled df, Original df]`
+            [resampled_df, data_frame]: returns the resampled data frame and the data 
+            frame constructed from the original trajectory `[Resampled df, Original df]`
         """
         new_time = np.arange(time[0], time[-1], new_time_step)
 
@@ -61,9 +64,6 @@ class TrajectoryResampler:
             df: NDArray containing the data read from the csv
         """
 
-        df = np.loadtxt(csv_file_path,
-                        dtype=np.float32,
-                        delimiter=',',
-                        skiprows=1)
+        df = np.loadtxt(csv_file_path, dtype=np.float32, delimiter=',', skiprows=1)
 
         return df

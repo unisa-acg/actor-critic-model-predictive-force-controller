@@ -18,9 +18,8 @@ for i in range(num_traj):
     #Trajectory parameters randomization
     params_randomizer = {
         'starting_point': (0, 0),
-        "operating_zone_points":
-        [(-0.25, -0.25),
-         (0.25, 0.25)],  # first element of tuple is y, the second one x
+        "operating_zone_points": [(-0.25, -0.25), (0.25, 0.25)
+                                 ],  # first element of tuple is y, the second one x
         'max_n_subtraj': 5,
         'max_vel': 3,
         'max_radius': 0.1,
@@ -30,21 +29,21 @@ for i in range(num_traj):
         'min_f_ref': 10,
         'max_f_ref': 80
     }
-    waypoints, traj_timestamps, traj_types, traj_params, force_reference_types, force_reference_parameters = R.traj_randomizer(
-        params_randomizer)
+    [
+        waypoints, traj_timestamps, traj_types, traj_params, force_reference_types,
+        force_reference_parameters
+    ] = R.traj_randomizer(params_randomizer)
 
     #Trajectory generation
-    [x, y,
-     f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
-                      force_reference_types, force_reference_parameters)
+    [x, y, f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
+                            force_reference_types, force_reference_parameters)
 
     now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     csv_dir_path = 'trajectory_commander/example_traj_{}'.format(now)
     csv_name = 'traj_gen_{}.csv'.format(i)
     TG.print_to_csv(csv_name, csv_dir_path)
 
-    time_vect = np.arange(traj_timestamps[0], traj_timestamps[-1],
-                          old_time_step)
+    time_vect = np.arange(traj_timestamps[0], traj_timestamps[-1], old_time_step)
 
     traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 

@@ -6,7 +6,8 @@ import os.path
 
 class TrajectoryGenerator():
     """
-    Class that contains method to generate, plot and save on a .csv file a trajectory given the parameters described in ``traj_gen()`` and a trend of reference forces. 
+    Class that contains method to generate, plot and save on a .csv file a trajectory 
+    given the parameters described in ``traj_gen()`` and a trend of reference forces. 
     The data are stored in a folder selected by the user.
     """
 
@@ -19,9 +20,8 @@ class TrajectoryGenerator():
     # ---------------------------------------------------------------------------- #
     # Trajectory generation section
 
-    def traj_gen(self, waypoints: list, traj_types: list,
-                 traj_parameters: list, traj_timestamps: list,
-                 force_ref_types: list, force_ref_params: list):
+    def traj_gen(self, waypoints: list, traj_types: list, traj_parameters: list,
+                 traj_timestamps: list, force_ref_types: list, force_ref_params: list):
         """Generate a trajectory made by sub-trajectory of different types.
 
         Supported parameters:
@@ -48,8 +48,7 @@ class TrajectoryGenerator():
         f_ref_traj = []
 
         if len(traj_types) != len(traj_parameters):
-            raise Exception(
-                "Trajectories types and parameters lengths do not match")
+            raise Exception("Trajectories types and parameters lengths do not match")
 
         for i in range(len(traj_types)):
             xi = waypoints[i]
@@ -60,32 +59,26 @@ class TrajectoryGenerator():
             if traj_types[i] == 'line':
                 [x, y] = self._line(xi, xf, self.ts, duration)
             elif traj_types[i] == 'circle':
-                [x, y] = self._circle(xi, xf, self.ts, duration,
-                                      traj_parameters[i])
+                [x, y] = self._circle(xi, xf, self.ts, duration, traj_parameters[i])
             elif traj_types[i] == 'sine_curve':
                 [x, y] = self._sine_curve(xi, xf, self.ts, duration,
-                                          traj_parameters[i][0],
-                                          traj_parameters[i][1])
+                                          traj_parameters[i][0], traj_parameters[i][1])
             else:
-                raise Exception(
-                    "No matching trajectory type found for trajectory" +
-                    str(i + 1))
+                raise Exception("No matching trajectory type found for trajectory" +
+                                str(i + 1))
 
             x_traj = np.append(x_traj, x)
             y_traj = np.append(y_traj, y)
 
             if force_ref_types[i] == 'cnst':
                 [s, f_ref] = self._line((0, force_ref_params[i]),
-                                        (1, force_ref_params[i]), self.ts,
-                                        duration)
+                                        (1, force_ref_params[i]), self.ts, duration)
             elif force_ref_types[i] == 'ramp':
                 [s, f_ref] = self._line((0, force_ref_params[i][0]),
-                                        (1, force_ref_params[i][1]), self.ts,
-                                        duration)
+                                        (1, force_ref_params[i][1]), self.ts, duration)
             else:
-                raise Exception(
-                    "No matching trajectory type found for trajectory" +
-                    str(i + 1))
+                raise Exception("No matching trajectory type found for trajectory" +
+                                str(i + 1))
 
             f_ref_traj = np.append(f_ref_traj, f_ref)
 
@@ -183,8 +176,7 @@ class TrajectoryGenerator():
 
         n_points = round(t_tot / ts)
 
-        x = np.linspace(0, np.sqrt((xf[0] - xi[0])**2 + (xf[1] - xi[1])**2),
-                        n_points)
+        x = np.linspace(0, np.sqrt((xf[0] - xi[0])**2 + (xf[1] - xi[1])**2), n_points)
         y = sin_eq(np.linspace(0, 1, n_points) * 2 * np.pi)
 
         # Sine rotation
@@ -207,12 +199,14 @@ class TrajectoryGenerator():
     # Plot section
 
     def plot_traj(self, x, y, params_randomizer):
-        """After calling ``traj_gen()`` method, it plots the points of the generated trajectory in the operative space
+        """After calling ``traj_gen()`` method, it plots the points of the 
+        generated trajectory in the operative space
 
         Args:
             x (NDArray): vector of x positions 
             y (NDArray): vector of y positions 
-            traj_timestamps (dict): dictionary containing the parameter for trajectory generation
+            traj_timestamps (dict): dictionary containing the parameter for 
+            trajectory generation
         
         Returns:
             Figure: xy-plane trajectory plot
@@ -242,7 +236,8 @@ class TrajectoryGenerator():
         return fig
 
     def plot_force_ref(self, f_ref, traj_timestamps):
-        """After calling `traj_gen()` method, it plots the points of the generated force reference
+        """After calling `traj_gen()` method, it plots the points of the 
+        generated force reference
 
         Args:
             f_ref (NDArray): vector of reference forces 
@@ -285,7 +280,7 @@ class TrajectoryGenerator():
         with open(csv_full_path, "a") as f:
             writer = csv.writer(f)
             header = ['x', 'y', 'f']
-            trajectory = np.stack(
-                (self.x_traj_tot, self.y_traj_tot, self.f_ref_tot), axis=-1)
+            trajectory = np.stack((self.x_traj_tot, self.y_traj_tot, self.f_ref_tot),
+                                  axis=-1)
             writer.writerow(header)
             writer.writerows(trajectory)

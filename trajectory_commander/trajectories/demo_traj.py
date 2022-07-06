@@ -39,16 +39,17 @@ for i in range(num_traj):
                       force_reference_types, force_reference_parameters)
 
     now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    csv_dir_path = 'Robosuite/example_traj_{}'.format(now)
+    csv_dir_path = 'trajectory_commander/example_traj_{}'.format(now)
     csv_name = 'traj_gen_{}.csv'.format(i)
     TG.print_to_csv(csv_name, csv_dir_path)
 
-    time = np.arange(traj_timestamps[0], traj_timestamps[-1], old_time_step)
+    time_vect = np.arange(traj_timestamps[0], traj_timestamps[-1],
+                          old_time_step)
 
     traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 
     #Trajectory resampling
-    TR.interp_traj(traj_matrix, time, new_time_step)
+    TR.interp_traj(traj_matrix, time_vect, new_time_step)
     csv_res_name = 'traj_res_{}.csv'.format(i)
     csv_res_path = os.path.join(csv_dir_path, csv_res_name)
     TR.traj_res_csv(csv_res_path)

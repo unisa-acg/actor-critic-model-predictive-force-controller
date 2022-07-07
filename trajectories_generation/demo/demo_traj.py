@@ -10,9 +10,9 @@ from datetime import datetime
 TG = TrajectoryGenerator()
 TR = TrajectoryResampler()
 
-num_traj = 4
-old_time_step = 0.1
-new_time_step = 0.002
+num_traj = 4  #number of trajectories
+old_time_step = 0.1  #time step of the generated trajectories
+new_time_step = 0.002  #time step of the resampled trajectories
 
 for i in range(num_traj):
     #Trajectory parameters randomization
@@ -39,7 +39,7 @@ for i in range(num_traj):
                             force_reference_types, force_reference_parameters)
 
     now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    csv_dir_path = 'trajectories_generation/output/example_traj_{}'.format(now)
+    csv_dir_path = '../output/example_traj_{}'.format(now)
     csv_name = 'traj_gen_{}.csv'.format(i)
     TG.print_to_csv(csv_name, csv_dir_path)
 

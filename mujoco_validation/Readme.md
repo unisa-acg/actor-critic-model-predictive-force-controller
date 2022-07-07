@@ -3,7 +3,6 @@
 Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces.
 This method is validated in two different situations, as shown in the demos. These are based on the functions contained in the src folder.
 
-<!-- ----------------------------------------------------------------------- -->
 
 ## Folders list
 
@@ -14,4 +13,4 @@ This method is validated in two different situations, as shown in the demos. The
 | [output](/output) | Contain the .csv files, in which, step by step, the contact information are stored. |
 | [src](/src) | Contain the utilities functions that allow the demo to work. |
 
-[Back to top](#mujoco_validation)
+

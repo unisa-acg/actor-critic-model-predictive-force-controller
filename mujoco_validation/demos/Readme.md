@@ -26,7 +26,7 @@ For the default simulator parameters the output images will look like:
 
 Built-in Method             |  Explicit Method
 :-------------------------:|:-------------------------:
-![pic1](~/environment_identification/mujoco_validation/media/contact_force_panda_table_built_in.png)  |  ![pic2](~/environment_identification/mujoco_validation/media/contact_force_panda_table_explicit.png)
+![pic1](../media/contact_force_panda_table_built_in.png)  |  ![pic2](../media/contact_force_panda_table_explicit.png)
 
 ## Demo #2 - Robot-plane simulation
 
@@ -52,4 +52,4 @@ The simulation will show the robot coming in contact and stabiling it, then the 
 
 Built-in Method             |  Explicit Method
 :-------------------------:|:-------------------------:
-![picture 5](~/environment_identification/mujoco_validation/media/contact_force_sphere_floor_built_in.png)  |  ![picture 4](~/environment_identification/mujoco_validation/media/contact_force_sphere_floor_explicit.png)
+![picture 5](../media/contact_force_sphere_floor_built_in.png)  |  ![picture 4](../media/contact_force_sphere_floor_explicit.png)

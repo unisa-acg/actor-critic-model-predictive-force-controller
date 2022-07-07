@@ -250,7 +250,6 @@ class MujocoContactValidation:
         Must be called AFTER ``contact_forces()`` method"""
 
         step_vect = np.arange(0, self.contact_forces_calls, 1, dtype=int)
-        plt.rcParams["text.usetex"] = True
 
         for i in range(len(self.body_combinations)):
             is_all_zero = np.all((self.combinations_forces[i, :] == 0))

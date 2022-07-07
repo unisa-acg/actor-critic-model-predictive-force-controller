@@ -93,18 +93,9 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 
    ```sh
    cd environment_identification
-   conda create --name env_identification --file requirements.txt
+   conda create --name env_identification
    conda activate env_identification
-   ```
-
-### Clone mujoco_panda repository
-
-Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot.
-
-   ```sh
-   cd
-   cd environment_identification
-   git clone https://github.com/justagist/mujoco_panda.git
+   pip install -r requirements.txt
    ```
 
 ## List of Modules

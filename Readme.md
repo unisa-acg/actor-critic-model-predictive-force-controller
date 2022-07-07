@@ -22,6 +22,7 @@ This section explains how to setup the environment needed to launch the demos.
    ```sh
    sudo apt install pip
    ```
+   
 * Packages needed for Mujoco-Py
 
    ```sh

@@ -5,6 +5,5 @@
 
 environment_identification.code-workspace
 
-mujoco_panda/**
 buffer.txt
 contact_data_simulation.csv

@@ -4,13 +4,14 @@ import numpy as np
 from mujoco_panda import PandaArm
 from mujoco_panda.utils.viewer_utils import render_frame
 from mujoco_panda.controllers.torque_based_controllers import (
-    OSHybridForceMotionController, )
+    OSHybridForceMotionController,)
 import matplotlib.pyplot as plt
 import mujoco_validation.src.contact_forces_validation as validate
 import yaml
+
 # Model path
-MODEL_PATH = os.path.join(os.environ["MJ_PANDA_PATH"], 
-                                    "mujoco_panda/models/panda_block_table.xml")
+MODEL_PATH = os.path.join(os.environ["MJ_PANDA_PATH"],
+                          "mujoco_panda/models/panda_block_table.xml")
 
 # Load controller config
 with open(r'mujoco_validation/demos/config/ctrl_config.yaml') as file:
@@ -64,8 +65,8 @@ if __name__ == "__main__":
         render_frame(panda_arm.viewer, robot_pos, robot_ori)
         render_frame(panda_arm.viewer, waypoint, target_ori, alpha=0.2)
 
-        hybrid_force_controller.change_ft_dir(
-            [1, 1, 1, 1, 1, 1])  # start force control along Z axis
+        hybrid_force_controller.change_ft_dir([1, 1, 1, 1, 1,
+                                               1])  # start force control along Z axis
         hybrid_force_controller.set_goal(
             waypoint,
             target_ori,
@@ -73,7 +74,7 @@ if __name__ == "__main__":
             goal_torque=[0, 0, 0],
         )  # target force in cartesian frame
 
-        # --- If needed uncomment, it renders the visualization at a slower time 
+        # --- If needed uncomment, it renders the visualization at a slower time
         # rate ---
         # if elapsed_r >= 0.1:
         #     i += 1  # change target less frequently compared to render rate
@@ -86,7 +87,7 @@ if __name__ == "__main__":
         contact_forces_validation.contact_forces(panda_arm.sim)
 
         # Store results in csv file
-        contact_forces_validation.contact_forces_to_csv(panda_arm.sim, 
+        contact_forces_validation.contact_forces_to_csv(panda_arm.sim,
                                                         'contact_data_simulation')
 
     hybrid_force_controller.set_active(False)

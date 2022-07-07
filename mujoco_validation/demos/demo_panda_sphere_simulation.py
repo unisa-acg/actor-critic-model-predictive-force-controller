@@ -14,7 +14,7 @@ MODEL_PATH = os.path.join(os.environ["MJ_PANDA_PATH"],
                           "mujoco_panda/models/panda_block_table.xml")
 
 # Load controller config
-with open(r'mujoco_validation/demos/config/ctrl_config.yaml') as file:
+with open(r'config/ctrl_config.yaml') as file:
     ctrl_config = yaml.full_load(file)
 
 if __name__ == "__main__":

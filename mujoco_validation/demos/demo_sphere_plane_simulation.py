@@ -26,7 +26,7 @@ if __name__ == "__main__":
     steps = 600
 
     # Load the model and make a simulator
-    model_path = 'mujoco_validation/demos/sphere_plane.xml'
+    model_path = 'sphere_plane.xml'
     [sim, viewer] = start_simulation(model_path)
 
     # Import the class with the functions needed

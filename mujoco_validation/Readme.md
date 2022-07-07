@@ -5,13 +5,13 @@ This method is validated in two different situations, as shown in the demos. The
 
 <!-- ----------------------------------------------------------------------- -->
 
-## List of Packages
+## Folders list
 
-| Package                                                                       | Functionality                                      |
+| Folder                                                                       | Contents                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
 | [demos](/demos) | Contain the examples of different environments in which the cumulative contact forces between pair of bodies are validated and the information (penetration, velocity of deformation of the contact etc.) are extracted from the simulation. |
 | [media](/media) | Contain the images produced by the demos.|
 | [output](/output) | Contain the .csv files, in which, step by step, the contact information are stored. |
 | [src](/src) | Contain the utilities functions that allow the demo to work. |
 
-<p align="right">[<a href="#top">Back to top</a>]</p>
+[Back to top](#mujoco_validation)

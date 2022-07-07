@@ -12,8 +12,8 @@ The demo shows how this module works.
 
 | Folder                                                                       | Contents                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| [demo](/demo) | Contain the examples of random trajectories. In addition, plot the comparison between the generated and resampled ones.|
-| [output](/output) | Contain the folders in which the .csv files are stored. |
-| [src](/src) | Contain the utilities functions that allow the demo to work. |
+| [demo](/trajectories_generation/demo) | Contain the examples of random trajectories. In addition, plot the comparison between the generated and resampled ones.|
+| [output](/trajectories_generation/output) | Contain the folders in which the .csv files are stored. |
+| [src](/trajectories_generation/src) | Contain the utilities functions that allow the demo to work. |
 
 [Back to top](#trajectories_generation)

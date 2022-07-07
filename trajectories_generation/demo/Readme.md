@@ -26,7 +26,7 @@ Make sure you have followed the instructions in [getting started](../../Readme.m
     cd 
     cd environment_identification
     source set_env.sh
-    cd trajectories_generation/demos
+    cd trajectories_generation/demo
     python3 demo_traj.py
 ```
 

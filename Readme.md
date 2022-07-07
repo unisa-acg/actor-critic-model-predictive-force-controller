@@ -17,6 +17,20 @@ This section explains how to setup the environment needed to launch the demos.
    sudo apt install git
    ```
 
+* Pip
+
+   ```sh
+   sudo apt install pip
+   ```
+* Packages needed for Mujoco-Py
+
+   ```sh
+   sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
+   sudo apt install patchelf gcc
+   sudo apt install python3-dev build-essential libssl-dev libffi-dev libxml2-dev
+   sudo apt install libxslt1-dev zlib1g-dev libglew-dev
+   ```
+   
 ### Install MuJoCo 2.1.0
 
 MuJoCo is a physics engine that aims to facilitate research where fast and accurate simulation of articulated structures interacting with their environment is needed.

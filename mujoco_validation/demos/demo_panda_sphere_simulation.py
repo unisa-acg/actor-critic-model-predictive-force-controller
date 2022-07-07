@@ -1,9 +1,9 @@
 import os
 import time
 import numpy as np
-from mujoco_panda.mujoco_panda import PandaArm
-from mujoco_panda.mujoco_panda.utils.viewer_utils import render_frame
-from mujoco_panda.mujoco_panda.controllers.torque_based_controllers import (
+from mujoco_panda.panda_robot import PandaArm
+from mujoco_panda.utils.viewer_utils import render_frame
+from mujoco_panda.controllers.torque_based_controllers import (
     OSHybridForceMotionController,)
 import matplotlib.pyplot as plt
 import mujoco_validation.src.contact_forces_validation as validate

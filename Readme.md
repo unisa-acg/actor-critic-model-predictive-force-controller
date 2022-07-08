@@ -392,19 +392,30 @@ This section explains how to setup the environment needed to launch the demos
    ```
 
 3. Extract the MuJoCo downloaded library into the hidden folder `.mujoco`
-4. Add these lines to the `.bashrc` file:
+
    ```sh
-   export LD_LIBRARY_PATH=/home/user_name/.mujoco/mujoco210/bin #substitute username with your username
+   tar -xf mujoco210-linux-x86_64.tar.gz -C .
+   rm mujoco210-linux-x86_64.tar.gz
+   ```
+
+4. Add these lines to the `.bashrc` file:
+
+   ```sh
+   export LD_LIBRARY_PATH=$HOME/.mujoco/mujoco210/bin #substitute username with your username
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
-   export PATH="$LD_LIBRARY_PATH:$PATH
+   export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so
+   export PATH="$LD_LIBRARY_PATH:$PATH"
    ```
 
 5. Source the `.bashrc` file:
+
    ```sh
+   cd
    source .bashrc
    ```
 
 6. Test the installation:
+
    ```sh
    cd ~/.mujoco/mujoco210/bin
    ./simulate ../model/humanoid.xml
@@ -473,7 +484,7 @@ To be added...
 # Component Repos
 <div id="componentrepos"></div>
 
-| Repo                                                                       | Functionality                                      |
+| Package                                                                       | Functionality                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
 | [MuJoCo Validation](/mujoco_validation) | Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces. |
 | [Trajectory Generation](/trajectory_generation) | Provide a pipeline to retrieve customizable 2D trajectories, keeping track of the various steps through .csv files. |

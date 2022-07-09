@@ -8,6 +8,4 @@ Finally the processed and unprocessed data are plotted to compare them.
 
 | Folder                                                                       | Contents                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| [main](/dataset_generation/main) | Contain the file used to generate the .csv dataset. In addition, plot simulation information and store the data of the most important steps in .csv files |
-| [output](/dataset_generation/output) | Contain the .csv files, divided into four subfolders. |
 | [src](/dataset_generation/src) | Contain the utilities functions that allow the demo to work. |

@@ -6,19 +6,17 @@ import numpy as np
 
 class DataForDataset:
     """
-    Class that contains method to plot and store in .csv files the info happening during the MuJoCo simulation for the creation of the dataset. 
+    Class that contains method to plot and store in .csv files the info happening during 
+    the MuJoCo simulation for the creation of the dataset. 
     The data from the simulation are stored in a folder selected by the user.
-
-    Methods
-    -------
-    * __init__(steps): instantiate the variables need for the other methods
-
-    * get_info_robot(env, bodies_name): it extracts the useful data from the simulation
-
-    * contact_info_to_csv(csv_file_path): after calling get_info_robot() method, stores all the contact information registered during the simulation into a .csv file in the specified folder
     """
 
     def __init__(self, steps):
+        """Instantiate the variables need for the other methods.
+
+        Args:
+            steps: number of total simulation steps 
+        """
         self.ee_pos = np.zeros((steps, 3), dtype=np.float64, order="C")
         self.ee_ori = np.zeros((steps, 3), dtype=np.float64, order="C")
         self.ee_vel = np.zeros((steps, 3), dtype=np.float64, order="C")
@@ -32,7 +30,8 @@ class DataForDataset:
         """It extracts the useful data from the simulation
 
         Args:
-            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
+            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo 
+            simulation instance at current timestep)
             bodies_name: name of the bodies whose contact data need to be obtained 
         """
         self.ee_force[self.ncalls_get_info_robot, :] = env.robots[0].ee_force
@@ -54,7 +53,8 @@ class DataForDataset:
         self.ncalls_get_info_robot += 1
 
     def contact_info_to_csv(self, csv_name, csv_dir_path):
-        """After calling get_info_robot() method, prints the contact data into .csv files in the folder csv_folder
+        """After calling get_info_robot() method, prints the contact data into .csv 
+        files in the folder csv_folder
 
         Args:
             csv_file_path: path of the .csv file where the data will be saved

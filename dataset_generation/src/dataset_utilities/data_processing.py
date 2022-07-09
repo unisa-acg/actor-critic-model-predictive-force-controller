@@ -10,17 +10,14 @@ class DataProcessing:
     """
     Class that contains method to manipulate the data stored in the folder 'csv_folder' (normalization and Gaussian noise addition) and store them in .csv files.
     This dataset will be used to train the neural network whose task is to learn the forces produced by the robot-environment contact.
-
-    Methods
-    -------
-    * read_data_from_csv(env, csv_file_path): it reads the data from a .csv file, saving the header and the data
-
-    * contact_info_processed_to_csv(n): after calling read_data_from_csv() method, it processes (normalization and Gaussian noise addition) all the contact information registered during the simulation and stores them into a .csv file in the folder 'csv_folder'
-
-    * plot_data_comparison(): after calling read_data_from_csv() and contact_info_processed_to_csv() method, plot the info registered vs the info processed
     """
 
     def combine_trajectory_csv(self, csv_dir_path, processed=True):
+        """Combine the unprocessed trajectories in one .csv file
+
+        Args:
+            csv_dir_path: path of the .csv directory
+        """
         if processed == True:
             files = os.path.join(csv_dir_path, "sim_data_proc_*.csv")
         else:
@@ -34,12 +31,14 @@ class DataProcessing:
         self.robot_info = df.to_numpy()
 
     def contact_info_processed_to_csv(self, csv_name, csv_dir_path):
-        """After calling get_info_robot() and contact_info_processed_to_csv() method.
-        Normalization of the dataset to obtain a distribution with mean = 0 and std = 1.
-        Prints the normalized trajectories into .csv files in the folder csv_folder_resampled
+        """Normalization of the dataset to obtain a distribution with mean = 0 and 
+        std = 1.
+        Prints the normalized trajectories into .csv file in the folder processed_csv.
+        After calling combine_trajectory_csv() method.
 
         Args:
-            n: number of trajectories
+            csv_name (string): name of the csv file
+            csv_file_path (string): path of the csv file
         """
 
         csv_full_path = os.path.join(csv_dir_path, csv_name)
@@ -64,8 +63,8 @@ class DataProcessing:
             writer.writerows(np.array(self.robot_info_processed, dtype=np.float32))
 
     def plot_data_comparison(self):
-        """Plot the info registered vs the info processed.
-        After calling get_info_robot() and contact_info_processed_to_csv() method.
+        """Plot the information registered vs the information processed.
+        After calling contact_info_processed_to_csv() method.
         
         Returns:
             fig

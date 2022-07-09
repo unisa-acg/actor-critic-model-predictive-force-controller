@@ -19,6 +19,7 @@ from dataset_generation.src.utilities.sim_data_utilities import SimulationDataUt
 matplotlib.use('QtCairo')
 
 
+# Function to customize the environment
 def modify_XML():
     tree = ET.parse('sim_model.xml')
     root = tree.getroot()
@@ -58,6 +59,7 @@ def modify_XML():
     return xml_string
 
 
+# Function to add the boundary marker in the renderization
 def add_markers_op_zone(env, params_randomizer, table_pos_z):
     #bl : bottom left point
     #tr : top right point
@@ -100,29 +102,33 @@ env = suite.make(
 
 suite.utils.mjcf_utils.save_sim_model(env.sim, 'sim_model.xml')
 xml_string = modify_XML()
-env.reset_from_xml_string(xml_string)
+env.reset_from_xml_string(xml_string)  # Reset the environment with the desired
+# configuration
 
-smooth_ft_buffer = []  #deque(maxlen=20)
-smooth_ft_buffer.append(np.array([0, 0, 0, 0, 0, 0]))
 ####
 
 TG = TrajectoryGenerator()
 TR = TrajectoryResampler()
 DP = DataProcessing()
 
-num_traj = 3
-ee_pos = env._eef_xpos
-table_pos = env.sim.model.body_pos[1]
-gap = 0.072
-kp_pos = 150
-kp_f = 0.1
-old_time_step = 0.1
-new_time_step = 0.002
+# Selection of the parameters
+num_traj = 3  # Number of trajectories
+ee_pos = env._eef_xpos  # End-effector position (point from which the
+# approach trajectory starts)
+table_pos = env.sim.model.body_pos[1]  # Table position (point in which the
+# approach trajectory finishes)
+gap = 0.072  # Gap added to table position to ensure minimal
+# penetration
+kp_pos = 150  # Gain of the position controller
+kp_f = 0.1  # Gain of the force controller
+old_time_step = 0.1  # Time step of the generated trajectory
+new_time_step = 0.002  # Time step of the resampled trajectory (500Hz)
 
 now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
 for i in range(num_traj):
-    #Approaching trajectories
+    # APPROACHING TRAJECTORY
+    # Parameters definition
     waypoints = [(ee_pos[0], ee_pos[2]), (table_pos[0], table_pos[2] + gap + 0.05),
                  (table_pos[0], table_pos[2] + gap)]
     traj_types = ['line', 'line']
@@ -130,6 +136,8 @@ for i in range(num_traj):
     traj_timestamps = [0, 1, 5]
     force_reference_types = ['cnst', 'cnst']
     force_reference_parameters = [0, 0]
+
+    # Trajectory generation
     [traj_app_x, traj_app_z,
      traj_app_f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
                                force_reference_types, force_reference_parameters)
@@ -142,15 +150,17 @@ for i in range(num_traj):
 
     traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 
+    # Trajectory resampler
     TR.interp_traj(traj_matrix, time_vect, new_time_step)
     csv_res_path = 'output/traj_resampled_csv/res_{}'.format(now)
     csv_res_name = 'traj_res_{}.csv'.format(i)
     TR.traj_res_csv(csv_res_name, csv_res_path)
     df_approach = TR.read_traj_from_csv(os.path.join(csv_res_path, csv_res_name))
 
-    #Main trajectory
+    # MAIN TRAJECTORY
+    # Randomization of the parameters
     steps_required = 1e6
-    while steps_required > 5000:  #1e5:
+    while steps_required > 1e3:  # Maximum steps ammited
         params_randomizer = {
             'starting_point': (0, 0),
             "operating_zone_points": [(-0.25, -0.25),
@@ -164,43 +174,56 @@ for i in range(num_traj):
             'min_f_ref': 10,
             'max_f_ref': 80
         }
-        waypoints, traj_timestamps, traj_types, traj_params, force_reference_types, force_reference_parameters = R.traj_randomizer(
-            params_randomizer)
-        steps_required = (traj_timestamps[-1] + 6) / 0.002
 
+        # Parameters definition
+        [
+            waypoints, traj_timestamps, traj_types, traj_params, force_reference_types,
+            force_reference_parameters
+        ] = R.traj_randomizer(params_randomizer)
+
+        steps_required = (traj_timestamps[-1] + 6) / 0.002
     print('Steps required: ', steps_required)
 
+    # Trajectory generation
     [x, y, f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
                             force_reference_types, force_reference_parameters)
     TG.print_to_csv(csv_name, csv_dir_path)
 
-    # fig = TG.plot_traj(x, y, params_randomizer)
-    # fig2 = TG.plot_force_ref(f, traj_timestamps)
+    fig = TG.plot_traj(x, y, params_randomizer)  # Plot the generated trajectory
+    fig2 = TG.plot_force_ref(f, traj_timestamps)  # Plot the resampled trajectory
 
     time_vect = np.arange(traj_timestamps[0], traj_timestamps[-1], old_time_step)
-
     traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 
+    # Trajectory resampler
     TR.interp_traj(traj_matrix, time_vect, new_time_step)
     TR.traj_res_csv(csv_res_name, csv_res_path)
     dframe = TR.read_traj_from_csv(os.path.join(csv_res_path, csv_res_name))
 
+    # Vectors to traform the 2D trajectories in 3D
     traj_app_y = np.ones(len(df_approach)) * ee_pos[1]
     table_z = np.ones(len(dframe)) * (table_pos[2] + gap)
+
+    # Force vector given to the approach trajectory (it is not used as there is no
+    # contact)
     force_app = np.ones(len(df_approach)) * np.array(dframe[:, 2], dtype=np.float64)[0]
 
+    # Variables initialization
     i_dis = []
     flag = 0
     flag_dataset = 0
     force_sensor = []
-    smooth_ft_buffer = []  #deque(maxlen=20)
+
+    # Creation of a buffer to apply a low filter to the contact forces
+    smooth_ft_buffer = []
     smooth_ft_buffer.append(np.array([0, 0, 0, 0, 0, 0]))
 
-    ####TOLTI ATTRITI
-    env.sim.model.geom_friction[7] = [0, 0, 0]  #default[1.0, 0.005, 0.0001]
+    # Modification of frictions
+    env.sim.model.geom_friction[7] = [0, 0, 0]  # default[1.0, 0.005, 0.0001]
     env.sim.model.geom_friction[30] = [0, 0, 0]
 
-    #traj building
+    # TRAJECTORY BUILDING
+    # Approaching trajectory
     traj_approach = np.stack(
         (
             np.array(df_approach[:, 0], dtype=np.float64),
@@ -209,6 +232,7 @@ for i in range(num_traj):
         ),
         axis=-1,
     )
+    # Main trajectory
     main_traj = np.stack(
         (
             np.array(dframe[:, 0], dtype=np.float64),
@@ -217,18 +241,18 @@ for i in range(num_traj):
         ),
         axis=-1,
     )
-
+    # Final trajectory
     target_traj = np.concatenate((traj_approach, main_traj))
 
+    # Final reference force
     force_ref = np.concatenate((force_app, np.array(dframe[:, 2], dtype=np.float64)))
 
-    now_r = time.time()
     DFD = DataForDataset(len(target_traj))
     SDU = SimulationDataUtilities(env.horizon)
 
-    #Trajectory execution
+    # Trajectory execution
     for ii in range(len(target_traj)):
-        controller = env.robots[0].controller
+        controller = env.robots[0].controller  # Access to robot controller
         SDU.contact_forces(env, 'table_collision', 'ee_sphere_collision')
 
         smooth_ft_buffer.append(np.array(env.sim.data.sensordata))
@@ -236,7 +260,7 @@ for i in range(num_traj):
             smooth_ft_buffer.pop(0)
         force_vals = np.mean(np.asarray(smooth_ft_buffer).copy(), 0)
 
-        #force controller activation
+        # Force controller activation along z-direction
         if env.check_contact('ee_sphere_collision', 'table_collision') or flag == 1:
             controller.activate_pid_z = True
             controller.fs = force_vals[2]
@@ -247,24 +271,29 @@ for i in range(num_traj):
             controller.ki_pid = 0.001  #0.001
             flag = 1
 
-        if ii == len(df_approach) + 600 or flag_dataset == 1:
+        # Contact information recording for the final dataset
+        if ii == len(df_approach) + 600 or flag_dataset == 1:  # This condition allows
+            # to avoid the oscillating data coming from the impact during the
+            # approaching trajectory
             DFD.get_info_robot(env, 'robot0_right_hand')
             flag_dataset = 1
 
         action = np.append(target_traj[ii, :], np.array([0, -np.pi, 0]))
-        env.step(action)
+        env.step(action)  # Actual action of the step
 
         force_sensor.append(force_vals[2])
         i_dis.append(ii)
 
-        SDU.get_info_robot(env, 'robot0_right_hand')
+        SDU.get_info_robot(
+            env, 'robot0_right_hand')  # Contact information recording for the plots
 
         add_markers_op_zone(env, params_randomizer, table_pos[2])
 
-        # env.render()
+        env.render()
 
+    # After each trajectory an environment reset is done to restart from the neutral
+    # pose
     env.close()
-
     env = suite.make(
         "Lift",
         robots=["Panda"],  # load a Sawyer robot and a Panda robot
@@ -288,19 +317,23 @@ for i in range(num_traj):
     controller.integral = 0
     controller.activate_pid_z = False
 
-    # SDU.plot_contact_forces()
-    # SDU.plot_torques()
-    # SDU.plot_ee_pos_vel()
-    csv_proc_path = 'output/unprocessed_csv/unprocessed_{}'.format(now)
-    csv_proc_name = 'sim_data_{}.csv'.format(i)
-    DFD.contact_info_to_csv(csv_proc_name, csv_proc_path)
+    # Output generation
+    SDU.plot_contact_forces()
+    SDU.plot_torques()
+    SDU.plot_ee_pos_vel()
+    csv_unproc_path = 'output/unprocessed_csv/unprocessed_{}'.format(now)
+    csv_unproc_name = 'sim_data_{}.csv'.format(i)
+    DFD.contact_info_to_csv(csv_unproc_name,
+                            csv_unproc_path)  # Unprocessed data stored in csv file
 
-    # plt.figure()
-    # plt.plot(i_dis, force_sensor)
+    # Smoothed force plotted
+    plt.figure()
+    plt.plot(i_dis, force_sensor)
 
-DP.combine_trajectory_csv(csv_proc_path, False)
-csv_dir_path = 'output/processed_csv/processed_{}'.format(now)
-csv_name = 'sim_data_proc.csv'
-DP.contact_info_processed_to_csv(csv_name, csv_dir_path)
-# DP.plot_data_comparison()
+DP.combine_trajectory_csv(csv_unproc_path, False)
+csv_proc_path = 'output/processed_csv/processed_{}'.format(now)
+csv_proc_name = 'sim_data_proc.csv'
+DP.contact_info_processed_to_csv(csv_proc_name,
+                                 csv_proc_path)  # Creation of the dataset
+DP.plot_data_comparison()
 plt.show()

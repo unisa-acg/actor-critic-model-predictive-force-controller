@@ -1,4 +1,4 @@
-aClick>=7.0
+Click>=7.0
 matplotlib>=3.1.2
 mujoco_py>=2.1.2.14
 numpy>=1.17.4
@@ -17,4 +17,9 @@ imageio>=2.1.2
 cffi>=1.10
 fasteners~=0.15
 numpy-quaternion
--e 
+numba==0.55.2
+PyQt5==5.15.7
+PySide2==5.15.2.1
+pytest==7.1.2
+pandas==1.4.2
+Pillow==9.2.0

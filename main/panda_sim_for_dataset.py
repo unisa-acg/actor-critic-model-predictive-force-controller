@@ -110,7 +110,7 @@ TG = TrajectoryGenerator()
 TR = TrajectoryResampler()
 DP = DataProcessing()
 
-num_traj = 4
+num_traj = 3
 ee_pos = env._eef_xpos
 table_pos = env.sim.model.body_pos[1]
 gap = 0.072
@@ -134,7 +134,7 @@ for i in range(num_traj):
      traj_app_f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
                                force_reference_types, force_reference_parameters)
 
-    csv_dir_path = '../output/traj_generated_csv/gen_{}'.format(now)
+    csv_dir_path = 'output/traj_generated_csv/gen_{}'.format(now)
     csv_name = 'traj_gen_{}.csv'.format(i)
     TG.print_to_csv(csv_name, csv_dir_path)
 
@@ -143,7 +143,7 @@ for i in range(num_traj):
     traj_matrix = TR.read_traj_from_csv(os.path.join(csv_dir_path, csv_name))
 
     TR.interp_traj(traj_matrix, time_vect, new_time_step)
-    csv_res_path = '../output/traj_resampled_csv/res_{}'.format(now)
+    csv_res_path = 'output/traj_resampled_csv/res_{}'.format(now)
     csv_res_name = 'traj_res_{}.csv'.format(i)
     TR.traj_res_csv(csv_res_name, csv_res_path)
     df_approach = TR.read_traj_from_csv(os.path.join(csv_res_path, csv_res_name))
@@ -263,14 +263,35 @@ for i in range(num_traj):
 
         # env.render()
 
-    # env.reset_from_xml_string(xml_string)
+    env.close()
+
+    env = suite.make(
+        "Lift",
+        robots=["Panda"],  # load a Sawyer robot and a Panda robot
+        gripper_types=None,  # use default grippers per robot arm #"WipingGripper"
+        controller_configs=controller_config,  # each arm is controlled using OSC
+        env_configuration=
+        "single-arm-opposed",  # (two-arm envs only) arms face each other
+        has_renderer=True,  # on-screen rendering
+        render_camera="frontview",  # visualize the "frontview" camera
+        has_offscreen_renderer=False,  # no off-screen rendering
+        control_freq=500,  # 20 hz control for applied actions
+        horizon=500000,  # each episode terminates after 200 steps
+        use_object_obs=False,  # no observations needed
+        use_camera_obs=False,  # no observations needed
+    )
+
+    suite.utils.mjcf_utils.save_sim_model(env.sim, 'sim_model.xml')
+    xml_string = modify_XML()
+    env.reset_from_xml_string(xml_string)
+
     controller.integral = 0
     controller.activate_pid_z = False
 
     # SDU.plot_contact_forces()
     # SDU.plot_torques()
     # SDU.plot_ee_pos_vel()
-    csv_proc_path = '../output/unprocessed_csv/unprocessed_{}'.format(now)
+    csv_proc_path = 'output/unprocessed_csv/unprocessed_{}'.format(now)
     csv_proc_name = 'sim_data_{}.csv'.format(i)
     DFD.contact_info_to_csv(csv_proc_name, csv_proc_path)
 
@@ -278,7 +299,7 @@ for i in range(num_traj):
     # plt.plot(i_dis, force_sensor)
 
 DP.combine_trajectory_csv(csv_proc_path, False)
-csv_dir_path = '../output/processed_csv/processed_{}'.format(now)
+csv_dir_path = 'output/processed_csv/processed_{}'.format(now)
 csv_name = 'sim_data_proc.csv'
 DP.contact_info_processed_to_csv(csv_name, csv_dir_path)
 # DP.plot_data_comparison()

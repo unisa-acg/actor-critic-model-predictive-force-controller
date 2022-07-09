@@ -400,16 +400,16 @@ This section explains how to setup the environment needed to launch the demos
    git clone https://github.com/StanfordVL/robosuite.git
    ```
 
-2. Rename robosutie folder to avoid path conflicts
+2. Rename robosuite folder to avoid path conflicts
 
    ```sh
    mv robosuite robosuite_master
-    ```
+   ```
 
 3. Substitute the file osc.py in robosuite:
 
    ```sh
-   mv dataset_generation/osc.py robosuite/controllers
+   cp dataset_generation/osc.py robosuite_master/robosuite/controllers
    ```
 
 ### Create and activate a Conda environment with the required packages

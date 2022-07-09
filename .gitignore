@@ -6,5 +6,7 @@
 environment_identification.code-workspace
 trajectory_commander/sim_model.xml
 trajectory_commander/sim_model_mod.xml
+main/sim_model_mod.xml
+main/sim_model.xml
 buffer.txt
 mujoco_validation/output/contact_data_simulation*.csv

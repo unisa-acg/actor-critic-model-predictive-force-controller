@@ -80,44 +80,43 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 
 ### Clone environment_identification
 
-1. Clone environment_identification repository and install the required pip packages:
+Clone environment_identification repository
 
    ```sh
    cd
    git clone https://bitbucket.org/unisa-polimi-idsia/environment_identification/
    ```
 
-2. Create and activate a Conda environment with the required packages:
+### Clone robosuite
+
+Robosuite is a simulation framework powered by the MuJoCo physics engine that offers a suite of benchmark environments.
+
+1. Clone the robosuite repository:
+
+   ```sh
+   cd environment_identification
+   git clone https://github.com/StanfordVL/robosuite.git
+   ```
+
+2. Rename robosuite folder to avoid path conflicts
+
+   ```sh
+   mv robosuite robosuite_master
+   ```
+
+3. Substitute the file osc.py in robosuite:
+
+   ```sh
+   cp dataset_generation/osc.py robosuite_master/robosuite/controllers
+   ```
+
+### Create and activate a Conda environment with the required packages
 
    ```sh
    cd environment_identification
    conda create --name env_identification
    conda activate env_identification
    pip install -r requirements.txt
-   ```
-
-## Install Robosuite
-
-1. Clone the Robosuite repository and install the required pip packages:
-
-   ```sh
-   git clone https://github.com/StanfordVL/robosuite.git
-   cd robosuite
-   pip3 install -r requirements.txt
-   ```
-
-2. Test the installation:
-
-   ```sh
-   python robosuite/demos/demo_random_action.py
-   ```
-
-3. Substitute the file osc.py in Robosuite
-
-   ```sh
-   cd 
-   cd environment_identification
-   mv osc.py robosuite/robosuite/controllers
    ```
 
 ## List of Modules
@@ -141,6 +140,3 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 * **Luca Puricelli** - [PoliMi](https://www.polimi.it/)
 
 [Back to top](#environment-identification)
-
-
-

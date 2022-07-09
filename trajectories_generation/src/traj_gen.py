@@ -1,3 +1,4 @@
+from genericpath import exists
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
@@ -275,6 +276,9 @@ class TrajectoryGenerator():
         # Check if directory exists, otherwise create it
         if not os.path.isdir(csv_dir_path):
             os.makedirs(csv_dir_path)
+
+        if os.path.exists(csv_full_path):
+            os.remove(csv_full_path)
 
         # Write the trajectory to the csv
         with open(csv_full_path, "a") as f:

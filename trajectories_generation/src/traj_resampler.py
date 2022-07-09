@@ -42,13 +42,24 @@ class TrajectoryResampler:
 
         return [resampled_df, data_frame]
 
-    def traj_res_csv(self, csv_file_path):
+    def traj_res_csv(self, csv_name, csv_dir_path):
         """Prints resampled trajectory into a .csv file in the csv_file_path location
 
         Args:
             csv_file_path: path of the .csv file where the data will be saved
         """
-        with open(csv_file_path, "a") as f:
+
+        csv_full_path = os.path.join(csv_dir_path, csv_name)
+
+        # Check if directory exists, otherwise create it
+        if not os.path.isdir(csv_dir_path):
+            os.makedirs(csv_dir_path)
+
+        if os.path.exists(csv_full_path):
+            os.remove(csv_full_path)
+
+        # Write the trajectory to the csv
+        with open(csv_full_path, "a") as f:
             writer = csv.writer(f)
             header = ['x_res', 'y_res', 'f_res']
             writer.writerow(header)

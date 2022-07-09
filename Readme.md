@@ -400,7 +400,11 @@ This section explains how to setup the environment needed to launch the demos
    git clone https://github.com/StanfordVL/robosuite.git
    ```
 
-2. Extract the folder robosuite (NON SO FARLO CON I CON I COMANDI DA TERMINALE)
+2. Rename robosutie folder to avoid path conflicts
+
+   ```sh
+   mv robosuite robosuite_master
+    ```
 
 3. Substitute the file osc.py in robosuite:
 

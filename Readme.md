@@ -80,22 +80,18 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 
 ### Clone environment_identification
 
-1. Clone environment_identification repository and install the required pip packages:
+Clone environment_identification repository
 
    ```sh
    roscd; cd ../src/
    git clone https://bitbucket.org/unisa-polimi-idsia/environment_identification/
    ```
 
-2. Create and activate a Conda environment with the required packages:
+### Clone robosuite
 
-   ```sh
-   cd environment_identification
-   conda create --name env_identification
-   conda activate env_identification
-   pip install -r requirements.txt
-   ```
+Robosuite is a simulation framework powered by the MuJoCo physics engine that offers a suite of benchmark environments.
 
+<<<<<<< HEAD
 ## Workflow
 
 The code in this repository is organized in branches, while the workflow is inspired by [GitFlow](https://datasift.github.io/gitflow/IntroducingGitFlow.html) (an alternative guide can be found [here](https://www.atlassian.com/it/git/tutorials/comparing-workflows/gitflow-workflow)). There are two **official branches**:
@@ -396,6 +392,30 @@ This section explains how to setup the environment needed to launch the demos
    ```sh
    tar -xf mujoco210-linux-x86_64.tar.gz -C .
    rm mujoco210-linux-x86_64.tar.gz
+=======
+1. Clone the robosuite repository:
+
+   ```sh
+   cd environment_identification
+   git clone https://github.com/StanfordVL/robosuite.git
+   ```
+
+2. Extract the folder robosuite (NON SO FARLO CON I CON I COMANDI DA TERMINALE)
+
+3. Substitute the file osc.py in robosuite:
+
+   ```sh
+   mv dataset_generation/osc.py robosuite/controllers
+   ```
+
+### Create and activate a Conda environment with the required packages
+
+   ```sh
+   cd environment_identification
+   conda create --name env_identification
+   conda activate env_identification
+   pip install -r requirements.txt
+>>>>>>> [ADD] add codes and documentation
    ```
 
 4. Add these lines to the `.bashrc` file:
@@ -501,6 +521,7 @@ To be added...
 * **Alessandro Pozzi** - [PoliMi](https://www.polimi.it/)
 * **Luca Puricelli** - [PoliMi](https://www.polimi.it/)
 
+<<<<<<< HEAD
 
 <p align="right">[<a href="#top">Back to top</a>]</p>
 
@@ -704,3 +725,6 @@ If you want to debug a plugin library, the process is the same, except that the 
 ```json
 "program": "/opt/ros/melodic/lib/moveit_ros_move_group/move_group"
 ``` -->
+=======
+[Back to top](#environment-identification)
+>>>>>>> [ADD] add codes and documentation

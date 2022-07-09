@@ -126,6 +126,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
 | [MuJoCo Validation](/mujoco_validation) | Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces. |
 | [Trajectory Generation](/trajectory_generation) | Provide a pipeline to retrieve customizable 2D trajectories, keeping track of the various steps through .csv files. |
 | [Dataset Generation](/dataset_generation) | Provide a module to retrieve the useful data from the simulations and process them in oder to generate a .csv dataset able to train a neural network. |
+| [Main](/main) | Contains the main scripts used fo this repository. |
 
 ## Authors
 

@@ -15,7 +15,7 @@ Make sure you have followed the instructions in [getting started](../../Readme.m
     cd 
     cd environment_identification
     source set_env.sh
-    cd dataset_generation/main
+    cd main
     python3 panda_sim_for_dataset.py
 ```
 

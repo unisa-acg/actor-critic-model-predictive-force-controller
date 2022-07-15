@@ -16,7 +16,9 @@ The latter requires some limit parameters, that allow the creation of customized
 * the maximum and minimum radius of the circles (if the dimensions go out of the operative area, the radius is automatically reduced);
 * the maximum amplitude of the sine wave (if the dimensions go out of the operative area, the amplitude is automatically reduced);
 * the maximum frequency of the sine wave;
-* the maximum and minimum value of the reference force.
+* the maximum and minimum value of the reference force;
+* the maximum amplitude of the force sine wave;
+* the maximum frequency of the force sine wave;
 
 ## How to launch it
 

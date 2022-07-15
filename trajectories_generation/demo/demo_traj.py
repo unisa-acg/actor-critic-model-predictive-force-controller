@@ -27,7 +27,9 @@ for i in range(num_traj):
         'max_ampl': 0.1,
         'max_freq': 10,
         'min_f_ref': 10,
-        'max_f_ref': 80
+        'max_f_ref': 80,
+        'max_ampl_f': 20,
+        'max_freq_f': 10,
     }
     [
         waypoints, traj_timestamps, traj_types, traj_params, force_reference_types,

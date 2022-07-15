@@ -1,3 +1,4 @@
+from genericpath import exists
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
@@ -34,11 +35,12 @@ class TrajectoryGenerator():
                 - `sine_curve`: [amplitude,frequency]
 
             - Force reference types: 
-                `cnst`,`ramp`
+                `cnst`,`ramp`, `sine_curve`
 
             - Force reference parameters:
                 - `cnst`: value
                 - `ramp`: [initial value,final value] 
+                - `sine_curve`: [initial value,final value, amplitude,frequency]
 
         Returns:
             [x,y,f]: 
@@ -76,6 +78,11 @@ class TrajectoryGenerator():
             elif force_ref_types[i] == 'ramp':
                 [s, f_ref] = self._line((0, force_ref_params[i][0]),
                                         (1, force_ref_params[i][1]), self.ts, duration)
+            elif force_ref_types[i] == 'sine_curve':
+                [s, f_ref] = self._sine_curve_f(force_ref_params[i][0],
+                                                force_ref_params[i][1], self.ts,
+                                                duration, force_ref_params[i][2],
+                                                force_ref_params[i][3])
             else:
                 raise Exception("No matching trajectory type found for trajectory" +
                                 str(i + 1))
@@ -195,6 +202,49 @@ class TrajectoryGenerator():
 
         return [x_rot, y_rot]
 
+    def _sine_curve_f(self, f_start, f_end, ts, t_tot, ampl, freq):
+        """Generate a sine sub-trajectory
+
+        Args:
+            f_start (float): initial force value of the sine wave
+            f_end (float): final force value of the sine wave
+            ts (float): timestep for the trajectory generation
+            t_tot (float): total duration of the trajectory
+            ampl (float): amplitude of the sine wave
+            freq (int): frequency of the sine wave
+
+        Returns:
+            [x,y]: vectors containing x and y points of the trajectory
+        """
+        if (f_start == f_end):
+            raise Exception('Final point and initial point must be different')
+        if (isinstance(freq, int)) != True:
+            raise Exception('Frequency must be an integer number')
+
+        def sin_eq(x):
+            return ampl * np.sin(freq * x)
+
+        n_points = round(t_tot / ts)
+
+        x = np.linspace(0, np.sqrt(2 * (f_end - f_start)**2), n_points)
+        y = sin_eq(np.linspace(0, 1, n_points) * 2 * np.pi)
+
+        # Sine rotation
+        m = 1
+
+        if ((f_end - f_start < 0)):
+            theta = np.arctan(m) + np.pi
+        else:
+            theta = np.arctan(m)
+
+        rot_mtr = np.array([[np.cos(theta), -np.sin(theta)],
+                            [np.sin(theta), np.cos(theta)]])
+        [x_rot, y_rot] = rot_mtr.dot(np.array([x, y]))
+
+        y_rot = y_rot + f_start
+
+        return [x_rot, y_rot]
+
     # ---------------------------------------------------------------------------- #
     # Plot section
 
@@ -263,7 +313,8 @@ class TrajectoryGenerator():
         csv_name,
         csv_dir_path,
     ):
-        """Prints the trajectory generated into a csv file in the `csv_file_path` location 
+        """Prints the trajectory generated into a csv file in the `csv_file_path` 
+        location 
 
         Args:
             csv_name (string): name of the csv file
@@ -275,6 +326,9 @@ class TrajectoryGenerator():
         # Check if directory exists, otherwise create it
         if not os.path.isdir(csv_dir_path):
             os.makedirs(csv_dir_path)
+
+        if os.path.exists(csv_full_path):
+            os.remove(csv_full_path)
 
         # Write the trajectory to the csv
         with open(csv_full_path, "a") as f:

@@ -1,7 +1,7 @@
 # trajectories_generation
 
 Generate trajectories composed by three types of subtrajectory (line, circle and sine wave), which are then resampled to the desired frequency.
-For each subtrajectory a constant or a ramp force is associated.
+For each subtrajectory a constant, a ramp or a sine force is associated.
 A randomizer allows the randomization choice of the parameters.
 Both the generated and the resampled trajectories are saved in the output folder as .csv files.
 The demo shows how this module works.

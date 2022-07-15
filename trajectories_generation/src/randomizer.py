@@ -41,8 +41,7 @@ def _reduce_max_ampl_sine(max_ampl_user, bl, tr, xi, xf):
         theta = np.arctan(m)
     theta += np.pi / 2
 
-    # Circumscribe the sine wave into a rectangle to make it easier to check relative
-    # distances to border of operating area
+    # Circumscribe the sine wave into a rectangle to make it easier to check relative distances to border of operating area
     p1_rectx = xi[0] + max_ampl_user / 2 * np.cos(theta)
     p1_recty = xi[1] + max_ampl_user / 2 * np.sin(theta)
 
@@ -95,6 +94,47 @@ def _reduce_max_ampl_sine(max_ampl_user, bl, tr, xi, xf):
     return max_ampl_mod
 
 
+def _reduce_max_ampl_sine_force(max_ampl_f, max_f_ref, min_f_ref, f_start, f_end):
+    """Modidifies the maximum amplitude of the sine wave for the reference force, to 
+    contain it in the force range 
+    Args:
+        max_ampl_f (float): maximum amplitude of the sine wave for the reference force
+        max_f_ref (float): maximum value of the reference forces
+        min_f_ref (float): manimum value of the reference forces
+        f_start (float): initial force value
+        f_end (float): final force value
+    
+    Returns:
+        max_ampl_mod: reduce sine amplitude
+    """
+
+    # Circumscribe the sine wave into a rectangle to make it easier to check relative distances to border of operating area
+    p1 = f_start + max_ampl_f / 2
+    p2 = f_start - max_ampl_f / 2
+    p3 = f_end - max_ampl_f / 2
+    p4 = f_end + max_ampl_f / 2
+
+    # Check if the sine-rectangle exceeds the limits of the operating area
+    check = (p1 < max_f_ref) and (p2 > min_f_ref) and (p3 > min_f_ref) and (p4 <
+                                                                            max_f_ref)
+    i = 0
+    while (check != True) and (i < 300):
+        max_ampl_f = max_ampl_f - 0.1
+        p1 = f_start + max_ampl_f / 2
+        p2 = f_start - max_ampl_f / 2
+        p3 = f_end - max_ampl_f / 2
+        p4 = f_end + max_ampl_f / 2
+
+        check = (p1 < max_f_ref) and (p2 > min_f_ref) and (p3 > min_f_ref) and (
+            p4 < max_f_ref)
+
+        i += 1
+
+    max_ampl_mod_f = max_ampl_f
+
+    return max_ampl_mod_f
+
+
 def _reduce_max_radius(max_radius_user, bl, tr, xi):
     """Modifies the maximum radius of the circle, given by the user, to contain it in 
     operating zone
@@ -141,15 +181,16 @@ def traj_randomizer(params_randomizer_dict):
         'max_vel']  #max velocity of the end-effector to maintain contact
     min_radius = params_randomizer_dict['min_radius']  #minimum radius of the circle
     max_radius = params_randomizer_dict['max_radius']  #maximum radius of the circle
-    max_ampl = params_randomizer_dict['max_ampl']  #minimum amplitude of the sine wave
-    max_freq = params_randomizer_dict['max_freq']  #minimum amplitude of the sine wave
+    max_ampl = params_randomizer_dict['max_ampl']  # minimum amplitude of the sine wave
+    max_freq = params_randomizer_dict['max_freq']  # minimum frequency of the sine wave
     max_f_ref = params_randomizer_dict[
-        'max_f_ref']  #maximum value of the reference forces
+        'max_f_ref']  # maximum value of the reference forces
     min_f_ref = params_randomizer_dict[
-        'min_f_ref']  #minimum value of the reference forces
-
-    # for k, v in params_randomizer_dict_dict.items():
-    #     vars()[k] = v
+        'min_f_ref']  # minimum value of the reference forces
+    max_ampl_f = params_randomizer_dict['max_ampl_f']  # minimum amplitude of the sine
+    # wave for the force reference
+    max_freq_f = params_randomizer_dict['max_freq_f']  # minimum frequency of the sine
+    # wave for the force reference
 
     rand = np.random.randint(1, max_n_subtraj + 1)
 
@@ -161,7 +202,7 @@ def traj_randomizer(params_randomizer_dict):
     force_reference_params = [None] * rand
 
     traj_types_avail = ['line', 'circle', 'sine_curve']
-    force_reference_types_avail = ['cnst', 'ramp']
+    force_reference_types_avail = ['cnst', 'ramp', 'sine_curve']
 
     # Limits for traj generation
     bl = (operating_zone_points[0][1], operating_zone_points[0][0])
@@ -206,8 +247,8 @@ def traj_randomizer(params_randomizer_dict):
             length = (lin_length / (freq * 4) + ampl) * (freq * 4 * 1.7)
         min_time_subtraj = length / max_vel
 
-        # Timestamps section, randomly choose a duration between
-        # the minimun and the maximus admissible
+        # Timestamps section, randomly choose a duration between the minimun and the
+        # maximus admissible
         if i == 0:
             traj_timestamps[i] = np.random.randint(min_time_subtraj,
                                                    min_time_subtraj + 5)
@@ -230,16 +271,28 @@ def traj_randomizer(params_randomizer_dict):
                 f_start = np.random.randint(min_f_ref, max_f_ref)
                 f_end = np.random.randint(min_f_ref, max_f_ref)
                 force_reference_params[i] = [f_start, f_end]
+
+            elif new_subforce == 'sine_curve':
+                f_start = np.random.randint(min_f_ref, max_f_ref)
+                f_end = np.random.randint(min_f_ref, max_f_ref)
+
+                max_ampl_mod_f = _reduce_max_ampl_sine_force(max_ampl_f, max_f_ref,
+                                                             min_f_ref, f_start, f_end)
+                ampl_f = np.random.random() * max_ampl_mod_f
+                freq_f = np.random.randint(1, max_freq_f)
+                force_reference_params[i] = [f_start, f_end, ampl_f, freq_f]
+
         else:
             if force_reference_types[i - 1] == 'cnst':
                 prev_f_value = force_reference_params[i - 1]
 
-            elif force_reference_types[i - 1] == 'ramp':
+            elif force_reference_types[i - 1] == 'ramp' or force_reference_types[
+                    i - 1] == 'sine_curve':
                 prev_f_value = force_reference_params[i - 1][1]
 
-            # Keep the ramp start force in an interval (-30,+30) with respect
-            # to the previous ending reference force
-            around = 30
+            # Keep the ramp start force in an interval (-30,+30) with respect to the
+            # previous ending reference force
+            around = 1
             low_f_value = np.maximum(min_f_ref, prev_f_value - around)
             high_f_value = np.minimum(max_f_ref, prev_f_value + around)
 
@@ -250,6 +303,16 @@ def traj_randomizer(params_randomizer_dict):
                 f_start = np.random.randint(low_f_value, high_f_value)
                 f_end = np.random.randint(min_f_ref, max_f_ref)
                 force_reference_params[i] = [f_start, f_end]
+
+            elif new_subforce == 'sine_curve':
+                f_start = np.random.randint(low_f_value, high_f_value)
+                f_end = np.random.randint(min_f_ref, max_f_ref)
+
+                max_ampl_mod_f = _reduce_max_ampl_sine_force(max_ampl_f, max_f_ref,
+                                                             min_f_ref, f_start, f_end)
+                ampl_f = np.random.random() * max_ampl_mod_f
+                freq_f = np.random.randint(1, max_freq_f)
+                force_reference_params[i] = [f_start, f_end, ampl_f, freq_f]
 
     # For dimension equality insert the zero at the beginning of the timestamps vector
     traj_timestamps.insert(0, 0)

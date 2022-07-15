@@ -43,8 +43,7 @@ def _reduce_max_ampl_sine(max_ampl_user, bl, tr, xi, xf):
         theta = np.arctan(m)
     theta += np.pi / 2
 
-    # Circumscribe the sine wave into a rectangle to make it easier to check relative
-    # distances to border of operating area
+    # Circumscribe the sine wave into a rectangle to make it easier to check relative distances to border of operating area
     p1_rectx = xi[0] + max_ampl_user / 2 * np.cos(theta)
     p1_recty = xi[1] + max_ampl_user / 2 * np.sin(theta)
 
@@ -126,7 +125,8 @@ def _reduce_max_ampl_sine_force(max_ampl_f, max_f_ref, min_f_ref, f_start, f_end
 
     # Check if the sine-rectangle exceeds the limits of the operating area
     check = (
-        (p1 < max_f_ref) and (p2 > min_f_ref) and (p3 > min_f_ref) and (p4 < max_f_ref)
+        (p1 < max_f_ref) and (p2 > min_f_ref) and (
+            p3 > min_f_ref) and (p4 < max_f_ref)
     )
     i = 0
     while (check is False) and (i < 300):
@@ -240,11 +240,13 @@ def traj_randomizer(params_randomizer_dict):
     for i in range(rand):
         # Trajectory section
 
-        new_subtraj = traj_types_avail[np.random.randint(len(traj_types_avail))]
+        new_subtraj = traj_types_avail[np.random.randint(
+            len(traj_types_avail))]
 
         # To avoid two subsequent circles or sine waves
         if (i != 0) and (
-            (traj_types[i - 1] == "sine_curve") or (traj_types[i - 1] == "circle")
+            (traj_types[i - 1] ==
+             "sine_curve") or (traj_types[i - 1] == "circle")
         ):
             new_subtraj = "line"
 
@@ -298,7 +300,8 @@ def traj_randomizer(params_randomizer_dict):
         # Check the type of force reference chosen and generate it
         if i == 0:
             if new_subforce == "cnst":
-                force_reference_params[i] = np.random.randint(min_f_ref, max_f_ref)
+                force_reference_params[i] = np.random.randint(
+                    min_f_ref, max_f_ref)
 
             elif new_subforce == "ramp":
                 f_start = np.random.randint(min_f_ref, max_f_ref)
@@ -333,7 +336,8 @@ def traj_randomizer(params_randomizer_dict):
             high_f_value = np.minimum(max_f_ref, prev_f_value + around)
 
             if new_subforce == "cnst":
-                force_reference_params[i] = np.random.randint(low_f_value, high_f_value)
+                force_reference_params[i] = np.random.randint(
+                    low_f_value, high_f_value)
 
             elif new_subforce == "ramp":
                 f_start = np.random.randint(low_f_value, high_f_value)

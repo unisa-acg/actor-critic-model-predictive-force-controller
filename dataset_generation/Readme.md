@@ -8,4 +8,4 @@ Finally the processed and unprocessed data are plotted to compare them.
 
 | Folder                                                                       | Contents                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| [src](/dataset_generation/src) | Contain the utilities functions that allow the demo to work. |
+| [src](/dataset_generation/src) | Contain utilities functions necessary for the generation and control of the datset. |

@@ -1,7 +1,6 @@
 import robosuite as suite
 from robosuite.controllers import load_controller_config
 import numpy as np
-import time
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib
@@ -112,7 +111,7 @@ TR = TrajectoryResampler()
 DP = DataProcessing()
 
 # Selection of the parameters
-num_traj = 3  # Number of trajectories
+num_traj = 1  # Number of trajectories
 ee_pos = env._eef_xpos  # End-effector position (point from which the
 # approach trajectory starts)
 table_pos = env.sim.model.body_pos[1]  # Table position (point in which the
@@ -160,7 +159,7 @@ for i in range(num_traj):
     # MAIN TRAJECTORY
     # Randomization of the parameters
     steps_required = 1e6
-    while steps_required > 1e3:  # Maximum steps ammited
+    while steps_required > 1e5:  # Maximum steps ammited
         params_randomizer = {
             'starting_point': (0, 0),
             "operating_zone_points": [(-0.25, -0.25),
@@ -172,7 +171,9 @@ for i in range(num_traj):
             'max_ampl': 0.1,
             'max_freq': 10,
             'min_f_ref': 10,
-            'max_f_ref': 80
+            'max_f_ref': 80,
+            'max_ampl_f': 20,
+            'max_freq_f': 10,
         }
 
         # Parameters definition
@@ -293,25 +294,6 @@ for i in range(num_traj):
 
     # After each trajectory an environment reset is done to restart from the neutral
     # pose
-    env.close()
-    env = suite.make(
-        "Lift",
-        robots=["Panda"],  # load a Sawyer robot and a Panda robot
-        gripper_types=None,  # use default grippers per robot arm #"WipingGripper"
-        controller_configs=controller_config,  # each arm is controlled using OSC
-        env_configuration=
-        "single-arm-opposed",  # (two-arm envs only) arms face each other
-        has_renderer=True,  # on-screen rendering
-        render_camera="frontview",  # visualize the "frontview" camera
-        has_offscreen_renderer=False,  # no off-screen rendering
-        control_freq=500,  # 20 hz control for applied actions
-        horizon=500000,  # each episode terminates after 200 steps
-        use_object_obs=False,  # no observations needed
-        use_camera_obs=False,  # no observations needed
-    )
-
-    suite.utils.mjcf_utils.save_sim_model(env.sim, 'sim_model.xml')
-    xml_string = modify_XML()
     env.reset_from_xml_string(xml_string)
 
     controller.integral = 0

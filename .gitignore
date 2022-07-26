@@ -1,3 +1,9 @@
 *.vscode*
 .DS_Store
 
+**/__pycache__/**.pyc
+
+environment_identification.code-workspace
+
+buffer.txt
+mujoco_validation/output/contact_data_simulation*.csv

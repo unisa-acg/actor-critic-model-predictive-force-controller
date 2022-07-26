@@ -1,39 +1,42 @@
 #!/usr/bin/env python
 
 import os
-from click import prompt
-import mujoco_py
-import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
 import time
 
+import matplotlib.pyplot as plt
+import mujoco_py
+import numpy as np
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
+
 plt.ion()
-class DynamicUpdate():
-    #Suppose we know the x range
+
+
+class DynamicUpdate:
+    # Suppose we know the x range
     min_x = 0
     max_x = 10
 
     def on_launch(self):
-        #Set up plot
+        # Set up plot
         self.figure, self.ax = plt.subplots()
-        self.lines, = self.ax.plot([],[], 'o')
-        #Autoscale on unknown axis and known lims on the other
+        (self.lines,) = self.ax.plot([], [], "o")
+        # Autoscale on unknown axis and known lims on the other
         self.ax.set_autoscaley_on(True)
         self.ax.set_autoscalex_on(True)
-        #self.ax.set_xlim(self.min_x, self.max_x)
-        #Other stuff
+        # self.ax.set_xlim(self.min_x, self.max_x)
+        # Other stuff
         self.ax.grid()
         ...
 
     def on_running(self, xdata, ydata):
-        #Update data (with the new _and_ the old points)
+        # Update data (with the new _and_ the old points)
         self.lines.set_xdata(xdata)
         self.lines.set_ydata(ydata)
-        #Need both of these in order to rescale
+        # Need both of these in order to rescale
         self.ax.relim()
         self.ax.autoscale_view()
-        #We need to draw *and* flush
+        # We need to draw *and* flush
         self.figure.canvas.draw()
         self.figure.canvas.flush_events()
 
@@ -50,21 +53,22 @@ class DynamicUpdate():
     #         time.sleep(1)
     #     return xdata, ydata
 
+
 # Plot and data initializing
 c_force_plot = DynamicUpdate()
 c_force_plot.on_launch()
-plt.xlabel('Steps')
-plt.ylabel('Contact Force')
+plt.xlabel("Steps")
+plt.ylabel("Contact Force")
 xdata = []
 ydata = []
 k = 0
 fz = 0
 
-## Plot the force retrieved by elastic model 
+## Plot the force retrieved by elastic model
 c_force_el_plot = DynamicUpdate()
 c_force_el_plot.on_launch()
-plt.xlabel('Steps')
-plt.ylabel('Elastic Force')
+plt.xlabel("Steps")
+plt.ylabel("Elastic Force")
 xdata_el = []
 ydata_el = []
 
@@ -94,54 +98,56 @@ viewer = MjViewer(sim)
 for i in range(100):
     sim.step()
     viewer.render()
-    print('number of contacts', sim.data.ncon)
+    print("number of contacts", sim.data.ncon)
 
     for ii in range(sim.data.ncon):
         contact = sim.data.contact[ii]
-        print('dist', contact.dist)
+        print("dist", contact.dist)
         c_array = np.zeros(6, dtype=np.float64)
         mujoco_py.functions.mj_contactForce(sim.model, sim.data, ii, c_array)
-        print('c_array', c_array)
+        print("c_array", c_array)
         fz = c_array[0]
 
-        #Plot the data if contact registered
+        # Plot the data if contact registered
         if fz != 0:
             xdata.append(k)
             ydata.append(fz)
             ydata[0] = 0
             c_force_plot.on_running(xdata, ydata)
-            k = k+1
+            k = k + 1
 
         for kk in range(500):
-            if sim.data.efc_KBIP[kk,1] != 0:
-                #print(sim.data.efc_KBIP[kk])
-                #print(contact.solref)
-                #print(contact.solimp)
-                #print(contact.pos)
+            if sim.data.efc_KBIP[kk, 1] != 0:
+                # print(sim.data.efc_KBIP[kk])
+                # print(contact.solref)
+                # print(contact.solimp)
+                # print(contact.pos)
 
-                #Add marker of contact point to the renderer
-                viewer.add_marker(pos=np.array([contact.pos[0],contact.pos[1],contact.pos[2]]))
+                # Add marker of contact point to the renderer
+                viewer.add_marker(
+                    pos=np.array([contact.pos[0], contact.pos[1], contact.pos[2]])
+                )
                 viewer.render()
 
-                #Prove correlation of elastic model
+                # Prove correlation of elastic model
                 dist = contact.dist
-                stiffness = 1/(contact.solref[0]**2)
+                stiffness = 1 / (contact.solref[0] ** 2)
                 imped = contact.solimp[0]
                 mass_sphere = sim.model.body_mass[1]
-                f_el = dist*stiffness*mass_sphere/(1-imped)
-                vect_res = [dist,stiffness,mass_sphere,f_el]
+                f_el = dist * stiffness * mass_sphere / (1 - imped)
+                vect_res = [dist, stiffness, mass_sphere, f_el]
                 print("penetr, k, m_sphere, force = ", vect_res)
-                print(stiffness*dist*mass_sphere)
-                
+                print(stiffness * dist * mass_sphere)
+
                 xdata_el.append(k)
                 ydata_el.append(f_el)
-                c_force_el_plot.on_running(xdata_el,ydata_el)
+                c_force_el_plot.on_running(xdata_el, ydata_el)
 
 print("")
 print("At steady state we have:")
 print("Contact force =", fz, "N")
 print("Elastic force =", f_el, "N")
-print("Penetration =", dist*10**3, "mm")
+print("Penetration =", dist * 10**3, "mm")
 print("")
 
 input("Press 'Enter' to terminate the execution:")

@@ -3,7 +3,7 @@
     <body name="panda_link0" childclass="panda" >
         <inertial pos="0 0 0" quat="1 0 0 0" mass="3.06" diaginertia="0.3 0.3 0.3" />
         <geom class="visual" mesh="link0_visual" condim = "1"/>
-        <geom class="collision" mesh="link0_collision" condim = "1"/> 
+        <geom class="collision" mesh="link0_collision" condim = "1"/>
 
         <body name="panda_link1" pos="0 0 0.333">
             <inertial pos="3.875e-03 2.081e-03 -0.1750" quat="1 0 0 0" mass="4.970684" fullinertia="7.0337e-01 7.0661e-01 9.1170e-03 -1.3900e-04 6.7720e-03 1.9169e-02" />

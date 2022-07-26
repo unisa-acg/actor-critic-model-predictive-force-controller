@@ -1,9 +1,10 @@
 import os
-import time
 import threading
+import time
+
 import mujoco_py
-import quaternion
 import numpy as np
+import quaternion
 from mujoco_panda import PandaArm
 from mujoco_panda.utils.tf import quatdiff_in_euler
 from mujoco_panda.utils.viewer_utils import render_frame
@@ -17,11 +18,11 @@ Robot moves its end-effector 10cm upwards (+ve Z axis) from starting position.
 # --------- Modify as required ------------
 # Task-space controller parameters
 # stiffness gains
-P_pos = 1500.
-P_ori = 200.
+P_pos = 1500.0
+P_ori = 200.0
 # damping gains
-D_pos = 2.*np.sqrt(P_pos)
-D_ori = 1.
+D_pos = 2.0 * np.sqrt(P_pos)
+D_ori = 1.0
 # -----------------------------------------
 
 
@@ -29,9 +30,9 @@ def compute_ts_force(curr_pos, curr_ori, goal_pos, goal_ori, curr_vel, curr_omg)
     delta_pos = (goal_pos - curr_pos).reshape([3, 1])
     delta_ori = quatdiff_in_euler(curr_ori, goal_ori).reshape([3, 1])
     # print
-    F = np.vstack([P_pos*(delta_pos), P_ori*(delta_ori)]) - \
-        np.vstack([D_pos*(curr_vel).reshape([3, 1]),
-                   D_ori*(curr_omg).reshape([3, 1])])
+    F = np.vstack([P_pos * (delta_pos), P_ori * (delta_ori)]) - np.vstack(
+        [D_pos * (curr_vel).reshape([3, 1]), D_ori * (curr_omg).reshape([3, 1])]
+    )
 
     error = np.linalg.norm(delta_pos) + np.linalg.norm(delta_ori)
 
@@ -46,7 +47,7 @@ def controller_thread(ctrl_rate):
     target_pos = curr_ee.copy()
     while run_controller:
 
-        error = 100.
+        error = 100.0
         while error > threshold:
             now_c = time.time()
             curr_pos, curr_ori = p.ee_pose()
@@ -54,7 +55,8 @@ def controller_thread(ctrl_rate):
 
             target_pos[2] = z_target
             F, error = compute_ts_force(
-                curr_pos, curr_ori, target_pos, original_ori, curr_vel, curr_omg)
+                curr_pos, curr_ori, target_pos, original_ori, curr_vel, curr_omg
+            )
 
             if error <= threshold:
                 break
@@ -66,7 +68,7 @@ def controller_thread(ctrl_rate):
             p.step(render=False)
 
             elapsed_c = time.time() - now_c
-            sleep_time_c = (1./ctrl_rate) - elapsed_c
+            sleep_time_c = (1.0 / ctrl_rate) - elapsed_c
             if sleep_time_c > 0.0:
                 time.sleep(sleep_time_c)
 
@@ -75,7 +77,7 @@ if __name__ == "__main__":
 
     p = PandaArm.withTorqueActuators(render=True, compensate_gravity=True)
 
-    ctrl_rate = 1/p.model.opt.timestep
+    ctrl_rate = 1 / p.model.opt.timestep
 
     render_rate = 100
 
@@ -87,7 +89,7 @@ if __name__ == "__main__":
 
     curr_ee, original_ori = p.ee_pose()
 
-    target_z_traj = np.linspace(curr_ee[2], curr_ee[2]+0.1, 25).tolist()
+    target_z_traj = np.linspace(curr_ee[2], curr_ee[2] + 0.1, 25).tolist()
     z_target = curr_ee[2]
 
     target_pos = curr_ee

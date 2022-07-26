@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-from cmath import tau
 import os
-from click import prompt
+import time
+from cmath import tau
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 # Plot and data initializing
 xdata = []
@@ -36,19 +36,21 @@ MODEL_XML = """
 # Load the model and make a simulator
 model = mujoco_py.load_model_from_xml(MODEL_XML)
 sim = mujoco_py.MjSim(model)
-#viewer = MjViewer(sim)
+# viewer = MjViewer(sim)
 
 # Code for changing contact parameters (tau in this case)
 
-tau_vect = np.linspace(0.01, 0.1, num=1000) #convertito in stiffness da la stiffness falsa
+tau_vect = np.linspace(
+    0.01, 0.1, num=1000
+)  # convertito in stiffness da la stiffness falsa
 for tau_index in range(tau_vect.shape[0]):
 
-    model.geom_solref[1,0] = tau_vect[tau_index]
-    #print("tau",model.geom_solref[1,0],"damp ratio",model.geom_solref[1,1])
+    model.geom_solref[1, 0] = tau_vect[tau_index]
+    # print("tau",model.geom_solref[1,0],"damp ratio",model.geom_solref[1,1])
 
     for i in range(100):
         sim.step()
-        #viewer.render()
+        # viewer.render()
 
         contact = sim.data.contact[0]
         dist = contact.dist
@@ -56,15 +58,14 @@ for tau_index in range(tau_vect.shape[0]):
         mujoco_py.functions.mj_contactForce(sim.model, sim.data, 0, c_array)
         fz = c_array[0]
 
-    
-    #xdata.append(tau_vect[tau_index])
-    xdata.append(1/(tau_vect[tau_index]**2))
-    #ydata.append(dist/(tau_vect[tau_index]**2)*10/(1-0.99))
+    # xdata.append(tau_vect[tau_index])
+    xdata.append(1 / (tau_vect[tau_index] ** 2))
+    # ydata.append(dist/(tau_vect[tau_index]**2)*10/(1-0.99))
     ydata.append(dist)
 
-plt.xlabel('K falsa')
-plt.ylabel('Penetration')
-plt.plot(xdata,ydata)
+plt.xlabel("K falsa")
+plt.ylabel("Penetration")
+plt.plot(xdata, ydata)
 plt.show()
 
 input("Press 'Enter' to terminate the execution:")

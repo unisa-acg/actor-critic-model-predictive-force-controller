@@ -1,14 +1,14 @@
 #
-from click import prompt
-import numpy as np
 import csv
 import os.path
-import pandas as pd
+
 import mujoco_py
+import numpy as np
+import pandas as pd
+from click import prompt
 
 
 class Printing:
-
     def __init__(self):
         self.ncalls = 0
 
@@ -41,19 +41,21 @@ class Printing:
                 damp_ratio = contact.solref[1]
                 d = contact.solimp[0]
                 d_vect[i] = d
-                b_vect[i] = 2 / (tau*d)
-                k_vect[i] = d / ((tau**2) * (damp_ratio ** 2)
-                                 * (d**2))  # (njmax x 1)
+                b_vect[i] = 2 / (tau * d)
+                k_vect[i] = d / (
+                    (tau**2) * (damp_ratio**2) * (d**2)
+                )  # (njmax x 1)
                 dist_njmax[i] = data.active_contacts_efc_pos[i]  # (njmax x 1)
                 vel_njmax[i] = data.efc_vel[i]  # (njmax x 1)
 
                 # Calc reference acceleration
                 # (can be retrieved also via aref = sim.data.efc_aref)
-                aref_vect[i] = -(b_vect[i]*vel_njmax[i] +
-                                 k_vect[i]*dist_njmax[i])  # (njmax x 1)
+                aref_vect[i] = -(
+                    b_vect[i] * vel_njmax[i] + k_vect[i] * dist_njmax[i]
+                )  # (njmax x 1)
 
             # Calc unconstrained acceleration
-            qacc = data.qacc_unc # unconstrained acceleration in joint space (nv x 1)
+            qacc = data.qacc_unc  # unconstrained acceleration in joint space (nv x 1)
             J = data.efc_J  # constraint Jacobian (njmax x nv)
             Jqacc = J.dot(qacc)  # (njmax x nv) x (nv x 1) = (njmax x 1)
             # unconstrained acceleration in ee space
@@ -73,7 +75,7 @@ class Printing:
             A = J_invM.dot(np.transpose(J))
 
             # Calc F = (A+R)^-1 * (aref - a0)
-            inv_AR = np.linalg.pinv(A+R)
+            inv_AR = np.linalg.pinv(A + R)
             contact_forces_vect = inv_AR.dot(delta_a)  # (njmax x 1)
 
         return [contact_forces_vect, b_vect, k_vect, d_vect, ncon, efc_address_vect]
@@ -82,22 +84,23 @@ class Printing:
         """Given a MuJoCo Sim simulation prints all the contacts parameters and forces registered into a .csv file in the current location"""
 
         # Check if file .csv exists or not, ask the user to keep it and append to it or replace it
-        file_exists = os.path.exists('contact_data_simulation.csv')
+        file_exists = os.path.exists("contact_data_simulation.csv")
         if (file_exists == False) and (self.ncalls == 0):
             print("---")
             print("The 📄.csv file for the contacts data doesn't exists, creating it...")
-            open('contact_data_simulation.csv', 'x')
+            open("contact_data_simulation.csv", "x")
             print("---")
             self.ncalls = 1
 
         if (file_exists == True) and (self.ncalls == 0):
             print("---")
             keep = input(
-                "The 📄.csv file for the contacts data already exists, do you want to keep it? [y/n] ")
+                "The 📄.csv file for the contacts data already exists, do you want to keep it? [y/n] "
+            )
             if keep == "n":
                 print("File 📄.csv replaced")
-                os.remove('contact_data_simulation.csv')
-                open('contact_data_simulation.csv', 'x')
+                os.remove("contact_data_simulation.csv")
+                open("contact_data_simulation.csv", "x")
             print("---")
             self.ncalls = 1
 
@@ -107,15 +110,15 @@ class Printing:
         ncon = data.ncon
 
         # Store contact info in buffer, to be appended to main file containing all the steps.
-        mujoco_py.functions.mj_printData(model, data, 'buffer.txt')
+        mujoco_py.functions.mj_printData(model, data, "buffer.txt")
 
         # Retrieve only the lines of interest -> contact struct lines
-        with open('buffer.txt', 'r') as file:
+        with open("buffer.txt", "r") as file:
             lines = file.readlines()
-            index_begin_contact_mjdata = lines.index('CONTACT\n')
-            index_end_contact_mjdata = lines.index('EFC_TYPE\n')
+            index_begin_contact_mjdata = lines.index("CONTACT\n")
+            index_end_contact_mjdata = lines.index("EFC_TYPE\n")
             contact_lines = lines[index_begin_contact_mjdata:index_end_contact_mjdata]
-        contact_forces_string = ['contact_forces']
+        contact_forces_string = ["contact_forces"]
 
         # Write on main file the info of contact structure, including the contact forces retrieved by function mj_contact_forces
         f = open("contact_data_simulation.csv", "a")
@@ -123,21 +126,21 @@ class Printing:
 
         for i in range(len(contact_lines)):
             linesplit = contact_lines[i].split()
-            if 'dim' in linesplit:
-                linesplit_check = contact_lines[i-1].split()
+            if "dim" in linesplit:
+                linesplit_check = contact_lines[i - 1].split()
                 for k in range(ncon):
                     if str(k) in linesplit_check[0]:
                         index_contact = k
                         contact_forces_array = np.zeros(6, dtype=np.float64)
 
                         mujoco_py.functions.mj_contactForce(
-                            model, data, index_contact, contact_forces_array)
+                            model, data, index_contact, contact_forces_array
+                        )
 
                         for kk in range(len(contact_forces_array)):
-                            contact_forces_string.append(
-                                contact_forces_array[kk])
+                            contact_forces_string.append(contact_forces_array[kk])
                         writer.writerow(contact_forces_string)
-                        contact_forces_string = ['contact_forces']
+                        contact_forces_string = ["contact_forces"]
                         break
 
                 writer.writerow(linesplit)

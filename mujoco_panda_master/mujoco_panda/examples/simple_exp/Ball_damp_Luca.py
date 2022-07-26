@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-from cmath import tau
 import os
-from click import prompt
+import time
+from cmath import tau
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 # Plot and data initializing
 xdata = []
@@ -49,13 +49,13 @@ viewer = MjViewer(sim)
 
 # Code for changing contact parameters (tau in this case)
 
-#tau_vect = np.linspace(0.01, 0.1, num=1000) #convertito in stiffness da la stiffness falsa
+# tau_vect = np.linspace(0.01, 0.1, num=1000) #convertito in stiffness da la stiffness falsa
 tau_vect = np.array([0])
 for tau_index in range(tau_vect.shape[0]):
 
-    #model.geom_solref[1,0] = tau_vect[tau_index]
-    
-    print("tau",model.geom_solref[1,0],"damp ratio",model.geom_solref[1,1])
+    # model.geom_solref[1,0] = tau_vect[tau_index]
+
+    print("tau", model.geom_solref[1, 0], "damp ratio", model.geom_solref[1, 1])
 
     for i in range(500):
         sim.step()
@@ -82,15 +82,22 @@ for tau_index in range(tau_vect.shape[0]):
             pos = 0
 
         vel = sim.data.efc_vel[0]
-        
-        #t_force = model.geom_solref[1,0]*dist*100 + 200*model.geom_solref[1,1]*vel_dist*100
+
+        # t_force = model.geom_solref[1,0]*dist*100 + 200*model.geom_solref[1,1]*vel_dist*100
 
         if dist == 0:
             t_force = 0
         else:
-            t_force = 0.99*(model.geom_solref[1,0]*dist*100 + 2*model.geom_solref[1,1]*vel_dist*100) + 9.81
-        
-        real_k = model.geom_solref[1,0]*dist*100
+            t_force = (
+                0.99
+                * (
+                    model.geom_solref[1, 0] * dist * 100
+                    + 2 * model.geom_solref[1, 1] * vel_dist * 100
+                )
+                + 9.81
+            )
+
+        real_k = model.geom_solref[1, 0] * dist * 100
 
         d.append(dist)
         xdata.append(i)
@@ -99,24 +106,24 @@ for tau_index in range(tau_vect.shape[0]):
         teoric_f.append(t_force)
         ball_pos.append(pos)
         ball_vel.append(vel)
-    
-    damp = 9.81/vel_dist
 
-    print('damping', damp)
-    print('real k', real_k)    
-    #xdata.append(tau_vect[tau_index])
-    #xdata.append(1/(tau_vect[tau_index]**2))
-    #ydata.append(dist/(tau_vect[tau_index]**2)*10/(1-0.99))
-    #ydata.append(dist)
+    damp = 9.81 / vel_dist
+
+    print("damping", damp)
+    print("real k", real_k)
+    # xdata.append(tau_vect[tau_index])
+    # xdata.append(1/(tau_vect[tau_index]**2))
+    # ydata.append(dist/(tau_vect[tau_index]**2)*10/(1-0.99))
+    # ydata.append(dist)
 
 a = np.asarray(ball_pos)
-a.tofile('ball_pos.csv',sep=',')
+a.tofile("ball_pos.csv", sep=",")
 
 a = np.asarray(ball_vel)
-a.tofile('ball_vel.csv',sep=',')
+a.tofile("ball_vel.csv", sep=",")
 
 a = np.asarray(force)
-a.tofile('force.csv',sep=',')
+a.tofile("force.csv", sep=",")
 # plt.figure(1)
 # plt.xlabel('i')
 # plt.ylabel('dist')

@@ -5,11 +5,11 @@ import os.path
 from itertools import combinations
 
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import ion, show
 import mujoco_py
 import numpy as np
 import pandas as pd
 from click import prompt
+from matplotlib.pyplot import ion, show
 
 
 class MujocoContactValidation:

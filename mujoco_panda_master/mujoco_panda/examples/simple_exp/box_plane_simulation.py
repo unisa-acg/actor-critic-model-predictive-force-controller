@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
+import math
 import os
-from click import prompt
+import time
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-import math
 import validate as validate
-
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 if __name__ == "__main__":
 

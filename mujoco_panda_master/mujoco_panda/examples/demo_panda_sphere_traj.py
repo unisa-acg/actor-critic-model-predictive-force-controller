@@ -1,19 +1,19 @@
+import csv
+import logging
 import os
 import time
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
 from mujoco_panda import PandaArm
-from mujoco_panda.utils.viewer_utils import render_frame
-from mujoco_panda.utils.debug_utils import ParallelPythonCmd
 from mujoco_panda.controllers.torque_based_controllers import (
     OSHybridForceMotionController,
 )
-from Trajectories.traj_utilities.traj_utils import traj_utilities
-import matplotlib.pyplot as plt
-import logging
-import csv
+from mujoco_panda.utils.debug_utils import ParallelPythonCmd
+from mujoco_panda.utils.viewer_utils import render_frame
 from simple_exp import contact_forces_validation as validate
-
+from Trajectories.traj_utilities.traj_utils import traj_utilities
 
 # Model path
 MODEL_PATH = os.environ["MJ_PANDA_PATH"] + "/mujoco_panda/models/"
@@ -54,9 +54,7 @@ if __name__ == "__main__":
 
     force_vect = np.array([50])
     tu = traj_utilities()
-    [df, traj_count] = tu.read_traj_from_csv(
-        csv_file_path="dataset.csv"
-    )
+    [df, traj_count] = tu.read_traj_from_csv(csv_file_path="dataset.csv")
 
     for force_index in range(force_vect.shape[0]):
 

@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
+import math
 import os
-from click import prompt
+import time
+
+import contact_forces_validation as validate
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-import math
-import contact_forces_validation as validate
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 
 def load_model_start_sim():

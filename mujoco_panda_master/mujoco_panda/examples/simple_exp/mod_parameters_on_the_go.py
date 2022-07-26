@@ -1,8 +1,9 @@
 import time
-import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
 
-XML = '''
+import numpy as np
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
+
+XML = """
 <mujoco>
     <worldbody>
         <geom name='floor' pos='0 0 0' size='5 5 .125' type='plane' condim='3'/>
@@ -12,7 +13,7 @@ XML = '''
         </body>
     </worldbody>
 </mujoco>
-'''
+"""
 
 
 model = load_model_from_xml(XML)

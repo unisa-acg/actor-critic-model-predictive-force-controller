@@ -1,15 +1,16 @@
+import logging
 import os
 import time
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
 from mujoco_panda import PandaArm
-from mujoco_panda.utils.viewer_utils import render_frame
-from mujoco_panda.utils.debug_utils import ParallelPythonCmd
 from mujoco_panda.controllers.torque_based_controllers import (
     OSHybridForceMotionController,
 )
-import matplotlib.pyplot as plt
-import logging
+from mujoco_panda.utils.debug_utils import ParallelPythonCmd
+from mujoco_panda.utils.viewer_utils import render_frame
 from simple_exp import contact_forces_validation as validate
 
 # Model path

@@ -6,4 +6,4 @@
 environment_identification.code-workspace
 
 buffer.txt
-contact_data_simulation.csv
+mujoco_validation/output/contact_data_simulation*.csv

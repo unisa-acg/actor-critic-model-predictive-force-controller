@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
+import math
 import os
-from click import prompt
+import time
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-import math
-
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 # Plot and data initializing
 steps = 200
@@ -21,7 +21,7 @@ a1_calc = np.zeros(steps, dtype=np.float64)
 pd = np.zeros(steps, dtype=np.float64)
 aref = np.zeros(steps, dtype=np.float64)
 delta_a = np.zeros(steps, dtype=np.float64)
-#AR =  np.zeros(steps, dtype=np.float64)
+# AR =  np.zeros(steps, dtype=np.float64)
 delta_a_calc = np.zeros(steps, dtype=np.float64)
 f_calc = np.zeros(steps, dtype=np.float64)
 xdata = []
@@ -49,15 +49,15 @@ MODEL_XML = """
 # Load the model and make a simulator
 model = mujoco_py.load_model_from_xml(MODEL_XML)
 sim = mujoco_py.MjSim(model)
-#viewer = MjViewer(sim)
+# viewer = MjViewer(sim)
 
 # calc b and k
 
 tau = model.geom_solref[1, 0]
 damp_ratio = model.geom_solref[1, 1]
 d = 0.99
-b = 2 / (tau*d)
-k = d / ((tau**2) * (damp_ratio ** 2) * (d**2))
+b = 2 / (tau * d)
+k = d / ((tau**2) * (damp_ratio**2) * (d**2))
 
 
 x_old = 0
@@ -81,10 +81,10 @@ for i in range(steps):
         x[i] = 0
         vel = 0
 
-    #v[i] = x[i] - x_old
+    # v[i] = x[i] - x_old
     v[i] = vel
 
-    #[a0[i],pd[i]] = calc_a0(x[i],v[i],a1[i],k,b,d)
+    # [a0[i],pd[i]] = calc_a0(x[i],v[i],a1[i],k,b,d)
 
     x_old = x[i]
     v_old = v[i]
@@ -102,7 +102,7 @@ for i in range(steps):
     # delta_a_calc[i] = Jqacc[0] - pd[i] # (nv x 1)
     # print(AR)
     # print(sim.data.efc_AR_rownnz)
-    #inv_AR = np.linalg.pinv(AR)
+    # inv_AR = np.linalg.pinv(AR)
     f_calc = np.linalg.pinv(AR).dot(delta_a)
 
 print(f_calc)

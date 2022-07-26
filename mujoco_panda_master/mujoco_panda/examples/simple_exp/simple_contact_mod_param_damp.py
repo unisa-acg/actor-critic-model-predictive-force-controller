@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-from cmath import tau
 import os
-from click import prompt
+import time
+from cmath import tau
+
+import matplotlib.pyplot as plt
 import mujoco_py
 import numpy as np
-from mujoco_py import load_model_from_xml, MjSim, MjViewer
-import matplotlib.pyplot as plt
-import time
-
+from click import prompt
+from mujoco_py import MjSim, MjViewer, load_model_from_xml
 
 # Plot and data initializing
 steps = 500
@@ -34,7 +34,6 @@ dresidual_old = 0
 kk = 0
 
 
-
 MODEL_XML = """
 <?xml version="1.0" ?>
 <mujoco>
@@ -51,7 +50,7 @@ MODEL_XML = """
 </mujoco>
 """
 
-#solref -10000 -200
+# solref -10000 -200
 # Load the model and make a simulator
 model = mujoco_py.load_model_from_xml(MODEL_XML)
 sim = mujoco_py.MjSim(model)
@@ -59,26 +58,24 @@ viewer = MjViewer(sim)
 
 # Code for changing contact parameters (tau in this case)
 
-#tau_vect = np.linspace(0.01, 0.1, num=1000) #convertito in stiffness da la stiffness falsa
+# tau_vect = np.linspace(0.01, 0.1, num=1000) #convertito in stiffness da la stiffness falsa
 tau_vect = np.array([0])
 for tau_index in range(tau_vect.shape[0]):
 
-    #model.geom_solref[1,0] = tau_vect[tau_index]
-    
-    print("tau",model.geom_solref[1,0],"damp ratio",model.geom_solref[1,1])
+    # model.geom_solref[1,0] = tau_vect[tau_index]
 
-    K_eq = np.abs(model.geom_solref[1,0]) * 1 * 1/(1-0.99)
-    R_eq = np.abs(model.geom_solref[1,1]) * 1 * 1/(1-0.99)
+    print("tau", model.geom_solref[1, 0], "damp ratio", model.geom_solref[1, 1])
+
+    K_eq = np.abs(model.geom_solref[1, 0]) * 1 * 1 / (1 - 0.99)
+    R_eq = np.abs(model.geom_solref[1, 1]) * 1 * 1 / (1 - 0.99)
     print(K_eq)
-    
-    # from tau to b and k. b damping, k stiffness
-    tau = model.geom_solref[1,0]
-    damp_ratio = model.geom_solref[1,1]
-    d = 0.99
-    b = 2 / (tau*d) 
-    k = 1 / ((tau**2) * (damp_ratio ** 2) * (d**2))
-    
 
+    # from tau to b and k. b damping, k stiffness
+    tau = model.geom_solref[1, 0]
+    damp_ratio = model.geom_solref[1, 1]
+    d = 0.99
+    b = 2 / (tau * d)
+    k = 1 / ((tau**2) * (damp_ratio**2) * (d**2))
 
     for i in range(steps):
         sim.step()
@@ -91,23 +88,23 @@ for tau_index in range(tau_vect.shape[0]):
         fz = c_array[0]
         qvel = sim.data.qvel
         vel_z = qvel[2]
-        
+
         # cal velocity of deformation
         dist_new = dist
         dist_punto = dist_new - dist_old
         dist_punto_vect.append(dist_punto)
 
-        #calc equivalent force
+        # calc equivalent force
         F_eq = K_eq * np.abs(dist) + R_eq * (dist_punto)
         ratio_forces_vect.append(F_eq / fz)
-        #calc R_eq backward 
+        # calc R_eq backward
         if dist_punto != 0:
-            R_eq_calc = (fz - K_eq * np.abs(dist_new))/(dist_punto)
-            ratio_vect.append(R_eq_calc / np.abs(model.geom_solref[1,1]))
+            R_eq_calc = (fz - K_eq * np.abs(dist_new)) / (dist_punto)
+            ratio_vect.append(R_eq_calc / np.abs(model.geom_solref[1, 1]))
         else:
             ratio_vect.append(0)
-        
-        #retrieve position of ball
+
+        # retrieve position of ball
         qpos = sim.data.qpos
         pos_z = qpos[2]
         pos_z_vect.append(pos_z)
@@ -118,12 +115,12 @@ for tau_index in range(tau_vect.shape[0]):
             residual_new = 0
 
         print(residual_new)
-        residual_vect[i] = residual_new 
+        residual_vect[i] = residual_new
 
         dresidual_new = residual_new - residual_old
-        a1 = dresidual_new - dresidual_old 
+        a1 = dresidual_new - dresidual_old
 
-        a0 = (a1 + d*(b*dresidual_new + k*residual_new)) / (1-d)
+        a0 = (a1 + d * (b * dresidual_new + k * residual_new)) / (1 - d)
 
         a0_vect[i] = a0
 
@@ -131,84 +128,81 @@ for tau_index in range(tau_vect.shape[0]):
         residual_old = residual_new
         dresidual_old = dresidual_new
 
-
         xdata.append(i)
-        
+
         fz_vect.append(fz)
         vel_z_vect.append(vel_z)
         dist_vect.append(dist)
         F_eq_vect.append(F_eq)
 
-    #print(fz)
-    #print(dist)
+    # print(fz)
+    # print(dist)
 
-    
     ##xdata.append(tau_vect[tau_index])
-    #xdata.append(1/(tau_vect[tau_index]**2))
+    # xdata.append(1/(tau_vect[tau_index]**2))
     ##ydata.append(dist/(tau_vect[tau_index]**2)*10/(1-0.99))
-    #ydata.append(dist)
+    # ydata.append(dist)
 
 print(residual_vect)
 print(a0_vect)
 
-for k in range(len(dist_vect)-1):
-    vel_deformation.append(dist_vect[k+1]-dist_vect[k]) 
+for k in range(len(dist_vect) - 1):
+    vel_deformation.append(dist_vect[k + 1] - dist_vect[k])
 vel_deformation.append(vel_deformation[k])
 
-#print(ratio_vect)
+# print(ratio_vect)
 
 plt.figure()
-plt.plot(xdata,ratio_vect)
+plt.plot(xdata, ratio_vect)
 
 plt.figure()
-plt.plot(xdata,residual_vect)
-plt.ylabel('Residual')
+plt.plot(xdata, residual_vect)
+plt.ylabel("Residual")
 
 plt.figure()
-plt.plot(xdata,a0_vect)
-plt.ylabel('a0')
-
+plt.plot(xdata, a0_vect)
+plt.ylabel("a0")
 
 
 plt.figure()
-plt.plot(xdata,ratio_forces_vect)
+plt.plot(xdata, ratio_forces_vect)
 
 plt.figure()
-plt.plot(xdata,pos_z_vect)
+plt.plot(xdata, pos_z_vect)
 alpha = 0.005
-x = np.linspace(0, i, i+1)
-y = np.exp(-alpha*x) + 2
-plt.plot(xdata,y)
+x = np.linspace(0, i, i + 1)
+y = np.exp(-alpha * x) + 2
+plt.plot(xdata, y)
 
 plt.figure()
-#plot penetration
+# plot penetration
 plt.subplot(2, 2, 1)
-plt.xlabel('Step')
-plt.ylabel('Penetration')
-plt.plot(xdata,dist_vect)
+plt.xlabel("Step")
+plt.ylabel("Penetration")
+plt.plot(xdata, dist_vect)
 plt.grid()
 
-#plot velocity
+# plot velocity
 plt.subplot(2, 2, 2)
-plt.xlabel('Step')
-plt.ylabel('Velocity')
-plt.plot(xdata,dist_punto_vect)
+plt.xlabel("Step")
+plt.ylabel("Velocity")
+plt.plot(xdata, dist_punto_vect)
 plt.grid()
 
-#plot contact force
+# plot contact force
 plt.subplot(2, 2, 3)
-plt.xlabel('Step')
-plt.ylabel('Contact Force')
-plt.plot(xdata,fz_vect)
+plt.xlabel("Step")
+plt.ylabel("Contact Force")
+plt.plot(xdata, fz_vect)
 plt.grid()
 
-#plot equivalent force
+# plot equivalent force
 plt.subplot(2, 2, 4)
-plt.xlabel('Step')
-plt.ylabel('Equivalent force')
-plt.plot(xdata,F_eq_vect)
+plt.xlabel("Step")
+plt.ylabel("Equivalent force")
+plt.plot(xdata, F_eq_vect)
 plt.grid()
 
-plt.show(block = False)
+plt.show(block=False)
 plt.pause(3)
 plt.close("all")

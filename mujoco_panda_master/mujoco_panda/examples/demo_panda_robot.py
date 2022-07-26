@@ -1,6 +1,7 @@
 from mujoco_panda import PandaArm
 from mujoco_panda.utils.debug_utils import ParallelPythonCmd
 
+
 """
 Testing PandaArm instance and parallel command utility
 
@@ -9,8 +10,9 @@ Testing PandaArm instance and parallel command utility
 
 """
 
+
 def exec_func(cmd):
-    if cmd == '':
+    if cmd == "":
         return None
     a = eval(cmd)
     print(cmd)
@@ -18,10 +20,11 @@ def exec_func(cmd):
     if a is not None:
         return str(a)
 
+
 if __name__ == "__main__":
-    
-    p = PandaArm.fullRobotWithTorqueActuators(render=True,compensate_gravity=True)
-    p.start_asynchronous_run() # run simulation in separate independent thread
+
+    p = PandaArm.fullRobotWithTorqueActuators(render=True, compensate_gravity=True)
+    p.start_asynchronous_run()  # run simulation in separate independent thread
 
     _cth = ParallelPythonCmd(exec_func)
 

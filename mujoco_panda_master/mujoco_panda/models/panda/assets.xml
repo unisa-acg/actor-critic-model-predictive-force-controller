@@ -26,7 +26,7 @@
     </asset>
     <default>
         <default class="panda">
-            
+
             <joint pos="0 0 0" axis="0 0 1" limited="true" damping="100"/>
             <position forcelimited="true" ctrllimited="true" user="1002 40 2001 -0.005 0.005"/>
             <default class="visual">

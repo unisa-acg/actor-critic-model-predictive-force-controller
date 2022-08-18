@@ -71,7 +71,7 @@ def _reduce_max_ampl_sine(max_ampl_user, bl, tr, xi, xf):
         and (p4_recty > bl[1] and p4_recty < tr[1])
     )
     i = 0
-    while ((check_x_dir and check_y_dir) is not True) and (i < 300):
+    while ((check_x_dir and check_y_dir) is False) and (i < 300):
         max_ampl_user = max_ampl_user - 0.01
         p1_rectx = xi[0] + max_ampl_user / 2 * np.cos(theta)
         p1_recty = xi[1] + max_ampl_user / 2 * np.sin(theta)
@@ -98,7 +98,7 @@ def _reduce_max_ampl_sine(max_ampl_user, bl, tr, xi, xf):
         )
         i += 1
 
-    max_ampl_mod = max_ampl_user
+    max_ampl_mod = max(0, max_ampl_user)
 
     return max_ampl_mod
 
@@ -129,7 +129,7 @@ def _reduce_max_ampl_sine_force(max_ampl_f, max_f_ref, min_f_ref, f_start, f_end
         (p1 < max_f_ref) and (p2 > min_f_ref) and (p3 > min_f_ref) and (p4 < max_f_ref)
     )
     i = 0
-    while (check is not True) and (i < 300):
+    while (check is False) and (i < 300):
         max_ampl_f = max_ampl_f - 0.1
         p1 = f_start + max_ampl_f / 2
         p2 = f_start - max_ampl_f / 2
@@ -164,7 +164,7 @@ def _reduce_max_radius(max_radius_user, bl, tr, xi):
         (xi[1] + max_radius_user) < tr[1]
     )
     i = 0
-    while ((check_x and check_y) is not True) and (i < 300):
+    while ((check_x and check_y) is False) and (i < 300):
         max_radius_user = max_radius_user - 0.01
         check_x = (xi[0] - 2 * max_radius_user) > bl[0]
         check_y = ((xi[1] - max_radius_user) > bl[1]) and (
@@ -172,7 +172,7 @@ def _reduce_max_radius(max_radius_user, bl, tr, xi):
         )
         i += 1
 
-    max_radius_mod = max_radius_user
+    max_radius_mod = max(0, max_radius_user)
     return max_radius_mod
 
 

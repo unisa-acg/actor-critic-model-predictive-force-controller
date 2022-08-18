@@ -46,8 +46,7 @@ class MujocoContactValidation:
         self.contact_forces_calls = 0
         self.steps = steps
         self.contact_forces_to_csv_call = 0
-        self.forces_vect_mujocoenv = np.zeros(
-            (6, steps), dtype=np.float64, order="C")
+        self.forces_vect_mujocoenv = np.zeros((6, steps), dtype=np.float64, order="C")
 
     # ---------------------------------------------------------------------------- #
     #                          Contact forces calculation                          #
@@ -67,8 +66,7 @@ class MujocoContactValidation:
             NDArray: (A+R)^-1 component
         """
 
-        M = np.ndarray(shape=(len(sim.data.qvel) ** 2,),
-                       dtype=np.float64, order="C")
+        M = np.ndarray(shape=(len(sim.data.qvel) ** 2,), dtype=np.float64, order="C")
         mujoco_py.functions.mj_fullM(sim.model, M, sim.data.qM)
         M = np.reshape(M, (len(sim.data.qvel), len(sim.data.qvel)))
         J = sim.data.efc_J
@@ -81,13 +79,13 @@ class MujocoContactValidation:
 
         # Invert only the "active" part of the matrix, the rest is full of zeros and
         # not of interest
-        AR_mod_efc[0: max_efc + 1, 0: max_efc + 1] = AR[
-            0: max_efc + 1, 0: max_efc + 1
+        AR_mod_efc[0 : max_efc + 1, 0 : max_efc + 1] = AR[
+            0 : max_efc + 1, 0 : max_efc + 1
         ]
         inv_AR_efc = np.linalg.pinv(AR_mod_efc)
         inv_AR = np.zeros((sim.model.njmax, sim.model.njmax), dtype=np.float64)
-        inv_AR[0: max_efc + 1, 0: max_efc + 1] = inv_AR_efc[
-            0: max_efc + 1, 0: max_efc + 1
+        inv_AR[0 : max_efc + 1, 0 : max_efc + 1] = inv_AR_efc[
+            0 : max_efc + 1, 0 : max_efc + 1
         ]
 
         return inv_AR
@@ -121,8 +119,7 @@ class MujocoContactValidation:
         body_names = sim.model.body_names
         combinations_vect = [i for i in combinations(body_names, 2)]
         counter_vect = np.zeros(len(combinations_vect), dtype=np.float64)
-        combinations_forces_vect = np.zeros(
-            len(combinations_vect), dtype=np.float64)
+        combinations_forces_vect = np.zeros(len(combinations_vect), dtype=np.float64)
         combinations_forces_built_in = np.zeros(
             len(combinations_vect), dtype=np.float64
         )
@@ -131,8 +128,7 @@ class MujocoContactValidation:
             self.combinations_forces_vect = np.zeros(
                 len(combinations_forces_vect), dtype=np.float64
             )
-            self.combinations_forces_vect = np.transpose(
-                self.combinations_forces_vect)
+            self.combinations_forces_vect = np.transpose(self.combinations_forces_vect)
             self.combinations_forces_built_in = np.zeros(
                 len(combinations_forces_built_in), dtype=np.float64
             )
@@ -157,8 +153,7 @@ class MujocoContactValidation:
             counter_vect[index_tuple] += 1
 
             # Retrieve also the contact forces with built-in functions for comparison
-            mujoco_py.functions.mj_contactForce(
-                sim.model, sim.data, i, c_array)
+            mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, c_array)
             f_normal_vect[efc_address] = c_array[0]
 
         vel_njmax = sim.data.efc_vel
@@ -167,8 +162,7 @@ class MujocoContactValidation:
 
         # Calc reference acceleration --- aref ---
         for k in range(len(k_vect)):
-            aref_vect[k] = -(k_vect[k] * dist_njmax[k] +
-                             b_vect[k] * vel_njmax[k])
+            aref_vect[k] = -(k_vect[k] * dist_njmax[k] + b_vect[k] * vel_njmax[k])
 
         # Calc unconstrained acceleration --- a0 ---
         # unconstrained acceleration in joint space (nv x 1)
@@ -241,13 +235,11 @@ class MujocoContactValidation:
                 contact_tuple = contact_list_tuple[ind_efc]
                 ind_tuple = combinations_vect.index(contact_tuple)
                 combinations_forces_vect[ind_tuple] = (
-                    combinations_forces_vect[ind_tuple] +
-                    contact_forces_vect[ind_efc]
+                    combinations_forces_vect[ind_tuple] + contact_forces_vect[ind_efc]
                 )
                 # Do the same for forces retrieved via built-in functions
                 combinations_forces_built_in[ind_tuple] = (
-                    combinations_forces_built_in[ind_tuple] +
-                    f_normal_vect[ind_efc]
+                    combinations_forces_built_in[ind_tuple] + f_normal_vect[ind_efc]
                 )
 
             self.combinations_forces_vect[
@@ -293,10 +285,8 @@ class MujocoContactValidation:
                 or sim.model.geom_id2name(contact.geom2) == geom2_name
             ):
                 forces_vect = np.zeros(6, dtype=np.float64)
-                mujoco_py.functions.mj_contactForce(
-                    sim.model, sim.data, i, forces_vect)
-                self.forces_vect_mujocoenv[:,
-                                           self.ncalls_force_mujocoenv] = forces_vect
+                mujoco_py.functions.mj_contactForce(sim.model, sim.data, i, forces_vect)
+                self.forces_vect_mujocoenv[:, self.ncalls_force_mujocoenv] = forces_vect
 
         self.ncalls_force_mujocoenv += 1
 
@@ -309,9 +299,9 @@ class MujocoContactValidation:
             fig
         """
 
-        fx = self.forces_vect_mujocoenv[2, 0: self.ncalls_force_mujocoenv]
-        fy = self.forces_vect_mujocoenv[1, 0: self.ncalls_force_mujocoenv]
-        fz = self.forces_vect_mujocoenv[0, 0: self.ncalls_force_mujocoenv]
+        fx = self.forces_vect_mujocoenv[2, 0 : self.ncalls_force_mujocoenv]
+        fy = self.forces_vect_mujocoenv[1, 0 : self.ncalls_force_mujocoenv]
+        fz = self.forces_vect_mujocoenv[0, 0 : self.ncalls_force_mujocoenv]
         fxyz_sq = np.power(fx, 2) + np.power(fy, 2) + np.power(fz, 2)
         f_mag = np.power(fxyz_sq, 0.5)
         step_vect = np.arange(0, self.ncalls_force_mujocoenv, 1)
@@ -351,29 +341,25 @@ class MujocoContactValidation:
             if not is_all_zero:
                 plt.figure()
                 str = " and ".join(self.combinations_vect[i])
-                plt.title(r"Contact force between " +
-                          str + "(Explicit Method)")
+                plt.title(r"Contact force between " + str + "(Explicit Method)")
                 plt.xlabel(r"Steps")
                 plt.ylabel(r"Total contact force $[N]$")
                 plt.grid()
                 plt.plot(
                     step_vect,
-                    self.combinations_forces_vect[i,
-                                                  0: self.contact_forces_calls],
+                    self.combinations_forces_vect[i, 0 : self.contact_forces_calls],
                     linewidth=2,
                 )
 
                 plt.figure()
                 str = " and ".join(self.combinations_vect[i])
-                plt.title(r"Contact force between " +
-                          str + "(Built In Method)")
+                plt.title(r"Contact force between " + str + "(Built In Method)")
                 plt.xlabel(r"Steps")
                 plt.ylabel(r"Total contact force $[N]$")
                 plt.grid()
                 plt.plot(
                     step_vect,
-                    self.combinations_forces_built_in[i,
-                                                      0: self.contact_forces_calls],
+                    self.combinations_forces_built_in[i, 0 : self.contact_forces_calls],
                     linewidth=2,
                     color="red",
                 )
@@ -430,8 +416,7 @@ class MujocoContactValidation:
             index_end_contact_mjdata = lines.index("EFC_TYPE\n")
             contact_lines = lines[index_begin_contact_mjdata:index_end_contact_mjdata]
             contact_lines[0] = (
-                contact_lines[0] + "Step " +
-                str(self.contact_forces_to_csv_call)
+                contact_lines[0] + "Step " + str(self.contact_forces_to_csv_call)
             )
 
         contact_forces_string = ["contact_forces"]
@@ -466,16 +451,14 @@ class MujocoContactValidation:
                     for k in range(ncon):
                         if str(k) in linesplit_check[0]:
                             index_contact = k
-                            contact_forces_array = np.zeros(
-                                6, dtype=np.float64)
+                            contact_forces_array = np.zeros(6, dtype=np.float64)
 
                             mujoco_py.functions.mj_contactForce(
                                 model, data, index_contact, contact_forces_array
                             )
 
                             for kk in range(len(contact_forces_array)):
-                                contact_forces_string.append(
-                                    contact_forces_array[kk])
+                                contact_forces_string.append(contact_forces_array[kk])
                             writer.writerow(contact_forces_string)
                             contact_forces_string = ["contact_forces"]
 
@@ -499,8 +482,7 @@ class MujocoContactValidation:
         if (file_exists is False) and (self.ncallspanda == 0):
             f = open("contact_information_panda.csv", "x")
             writer = csv.writer(f)
-            header = ["Penetration", "Velocity of deformation",
-                      "Contact force", "Ncon"]
+            header = ["Penetration", "Velocity of deformation", "Contact force", "Ncon"]
             writer.writerow(header)
             f.close()
             self.ncallspanda = 1
@@ -510,8 +492,7 @@ class MujocoContactValidation:
             os.remove("contact_information_panda.csv")
             f = open("contact_information_panda.csv", "x")
             writer = csv.writer(f)
-            header = ["Penetration", "Velocity of deformation",
-                      "Contact force", "Ncon"]
+            header = ["Penetration", "Velocity of deformation", "Contact force", "Ncon"]
             writer.writerow(header)
             f.close()
             self.ncallspanda = 1
@@ -528,8 +509,7 @@ class MujocoContactValidation:
             efc_address = data.contact[0].efc_address
             dist = data.active_contacts_efc_pos[efc_address]
             vel = data.efc_vel[efc_address]
-            mujoco_py.functions.mj_contactForce(
-                model, data, 0, contact_forces_array)
+            mujoco_py.functions.mj_contactForce(model, data, 0, contact_forces_array)
         else:
             dist = 0
             vel = 0

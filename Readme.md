@@ -67,7 +67,7 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 5. Source the `.bashrc` file:
 
    ```sh
-   cd 
+   cd
    source .bashrc
    ```
 
@@ -369,15 +369,9 @@ If you want to debug a plugin library, the process is the same, except that the 
 
 This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought for students with the aim to provide an environment for the development of master theses projects and some research activities.
 
-<b>Table of Contents</b>
+## Getting Started
 
-* <a href="#getting-started">Getting Started</a>
-   * <a href="#prerequisites">Prerequisites</a>
-   * <a href="#installmujoco">Install Mujoco</a>
-   * <a href="#installmujocopy">Install Mujoco-Py</a>
-* <a href="#usage">Usage</a>
-* <a href="#listofpackages">List of Packages</a>
-* <a href="#componentrepos">Component Repos</a>
+This section explains how to setup the environment needed to launch the demos.
 
 # Getting Started
 This section explains how to setup the environment needed to launch the demos
@@ -386,15 +380,13 @@ This section explains how to setup the environment needed to launch the demos
 
 * [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Git
+
    ```sh
    sudo apt install git
    ```
 
-## Install MuJoCo 2.1.0
-<div id="installmujoco"></div>
+* Pip
 
-1. Download MuJoCo library from [MuJoCo website](https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz)
-2. Create a hidden folder:
    ```sh
    mkdir /home/username/.mujoco
    ```
@@ -421,13 +413,13 @@ This section explains how to setup the environment needed to launch the demos
 ## Install MuJoCo-Py
 <div id="installmujocopy"></div>
 
-1. Create and activate a Conda environment for MuJoCo-Py:
    ```sh
-   conda create --name mujoco_py python=3.8
-   conda activate mujoco_py
+   cd .mujoco
+   wget https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz
    ```
 
-2. Install the required packages:
+3. Extract the MuJoCo downloaded library into the hidden folder `.mujoco`
+
    ```sh
    sudo apt update
    sudo apt install patchelf gcc
@@ -435,17 +427,17 @@ This section explains how to setup the environment needed to launch the demos
    sudo apt install libxslt1-dev zlib1g-dev libglew1.5 libglew-dev python3-pip
    ```
 
-3. Clone the MuJoCo-Py repository and install the required pip packages:
+4. Add these lines to the `.bashrc` file:
+
    ```sh
-   git clone https://github.com/openai/mujoco-py
-   cd mujoco-py
-   pip3 install -r requirements.txt
-   pip3 install -r requirements.dev.txt
-   pip3 install -e . --no-cache
+   export LD_LIBRARY_PATH=$HOME/.mujoco/mujoco210/bin #substitute username with your username
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
+   export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so
+   export PATH="$LD_LIBRARY_PATH:$PATH"
    ```
 
-4. Reboot your pc
-5. Activate the Conda virtual environment and install MuJoCo-Py:
+5. Source the `.bashrc` file:
+
    ```sh
    conda activate mujoco_py
    sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
@@ -453,13 +445,13 @@ This section explains how to setup the environment needed to launch the demos
    ```
 
 6. Test the installation:
+
    ```sh
-   cd examples
-   python3 markers_demo.py
+   cd ~/.mujoco/mujoco210/bin
+   ./simulate ../model/humanoid.xml
    ```
 
-# Usage
-<div id="usage"></div>
+### Clone environment_identification
 
 To be added...
 
@@ -483,7 +475,8 @@ To be added...
 
 | Repo                                                                       | Functionality                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| [Mujoco Panda](https://github.com/justagist/mujoco_panda) | Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot |
+| [MuJoCo Validation](/mujoco_validation) | Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces. |
+| [Trajectory Generation](/trajectory_generation) | Provide a pipeline to retrieve customizable 2D trajectories, keeping track of the various steps through .csv files. |
 
 ## Authors
 

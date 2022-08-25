@@ -1,4 +1,0 @@
-<mujoco>
-  <force name="ee_force_sensor" site="ee_site"/>
-  <torque name="ee_torque_sensor" site="ee_site"/>
-</mujoco>

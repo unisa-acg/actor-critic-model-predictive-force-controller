@@ -1,12 +1,13 @@
-import numpy as np
 import csv
 import os.path
+
+import numpy as np
 from scipy.interpolate import interp1d
 
 
 class TrajectoryResampler:
     """
-    Class that contains method to resample and plot the trajectories from a 
+    Class that contains method to resample and plot the trajectories from a
     trajectory matrix previously generated
     """
 
@@ -14,25 +15,26 @@ class TrajectoryResampler:
         self.ncalls = 0
 
     def interp_traj(self, traj_matrix, time, new_time_step=0.002):
-        """Resamples the trajectory `traj_matrix`, given a vector of sample times 
-        `time`, with a chosen time step `new_time_step` (default = 0.002). 
+        """Resamples the trajectory `traj_matrix`, given a vector of sample times
+        `time`, with a chosen time step `new_time_step` (default = 0.002).
 
         Args:
             traj_matrix (NDArray): 2D trajectory matrix
             time (NDArray, optional): vector of times used in sampling the traj_matrix.
-            new_time_step (float, optional): new time step for resampling. Defaults to 0.02.
-            
+            new_time_step (float, optional): new time step for resampling.
+            Defaults to 0.02.
+
         Returns:
-            [resampled_df, data_frame]: returns the resampled data frame and the data 
+            [resampled_df, data_frame]: returns the resampled data frame and the data
             frame constructed from the original trajectory `[Resampled df, Original df]`
         """
         new_time = np.arange(time[0], time[-1], new_time_step)
 
         resampled_df = np.stack(
             (
-                interp1d(time, traj_matrix[:, 0], kind='cubic')(new_time),
-                interp1d(time, traj_matrix[:, 1], kind='cubic')(new_time),
-                interp1d(time, traj_matrix[:, 2], kind='linear')(new_time),
+                interp1d(time, traj_matrix[:, 0], kind="cubic")(new_time),
+                interp1d(time, traj_matrix[:, 1], kind="cubic")(new_time),
+                interp1d(time, traj_matrix[:, 2], kind="linear")(new_time),
             ),
             axis=-1,
         )
@@ -61,7 +63,7 @@ class TrajectoryResampler:
         # Write the trajectory to the csv
         with open(csv_full_path, "a") as f:
             writer = csv.writer(f)
-            header = ['x_res', 'y_res', 'f_res']
+            header = ["x_res", "y_res", "f_res"]
             writer.writerow(header)
             writer.writerows(self.traj_resampled)
 
@@ -75,6 +77,6 @@ class TrajectoryResampler:
             df: NDArray containing the data read from the csv
         """
 
-        df = np.loadtxt(csv_file_path, dtype=np.float32, delimiter=',', skiprows=1)
+        df = np.loadtxt(csv_file_path, dtype=np.float32, delimiter=",", skiprows=1)
 
         return df

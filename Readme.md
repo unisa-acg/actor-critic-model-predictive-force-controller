@@ -112,6 +112,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
 
 ### Create and activate a Conda environment with the required packages
 
+
    ```sh
    cd environment_identification
    conda create --name env_identification

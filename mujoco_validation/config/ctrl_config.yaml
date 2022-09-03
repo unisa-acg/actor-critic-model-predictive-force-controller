@@ -1,0 +1,54 @@
+alpha: 0.0
+angular_error_thr: 0.01
+ft_dir:
+- 0
+- 0
+- 0
+- 0
+- 0
+- 0
+kd_f:
+- 0.0
+- 0.0
+- 0.0
+kd_o:
+- 1.0
+- 1.0
+- 1.0
+kd_p:
+- 167.33
+- 167.33
+- 167.33
+kd_t:
+- 0.0
+- 0.0
+- 0.0
+kp_f:
+- 1.0
+- 1.0
+- 1.0
+kp_o:
+- 3000.0
+- 3000.0
+- 3000.0
+kp_p:
+- 7000.0
+- 7000.0
+- 7000.0
+kp_t:
+- 1.0
+- 1.0
+- 1.0
+linear_error_thr: 0.025
+null_ctrl_wt: 2.5
+null_kd: 0
+null_kp:
+- 5.0
+- 10.0
+- 5.0
+- 10.0
+- 5.0
+- 10.0
+- 5.0
+use_null_space_control: true
+use_orientation_ctrl: true

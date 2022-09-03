@@ -1,23 +1,19 @@
-# Demo - Dataset creation
+# trajectories_generation
 
-## Simulation description
+Generate trajectories composed by three types of subtrajectory (line, circle and sine wave), which are then resampled to the desired frequency.
+For each subtrajectory a constant, a ramp or a sine force is associated.
+A randomizer allows the randomization choice of the parameters.
+Both the generated and the resampled trajectories are saved in the output folder as .csv files.
+The demo shows how this module works.
 
-This simulation consists in an environment composed of a Franka Emika Panda robot, with attached at the end-effector a sphere, and a fixed plane. The robot follows _N_ random trajectories and it is controlled via a position controller. The eventual contact forces between the sphere and the table are plotted at the end of the simulation.
+<!-- ----------------------------------------------------------------------- -->
 
-## How to launch it
+## Folders list
 
-Clone the repository (if not done previously) and inside the main folder execute the following commands to source the environment and launch the demo:
+| Folder                                                                       | Contents                                      |
+| :------------------------------------------------------------------------- | :------------------------------------------------- |
+| [demo](/trajectories_generation/demo) | Contain the examples of random trajectories. In addition, plot the comparison between the generated and resampled ones.|
+| [output](/trajectories_generation/output) | Contain the folders in which the .csv files are stored. |
+| [src](/trajectories_generation/src) | Contain the utilities functions that allow the demo to work. |
 
-```sh
-    source set_env.sh
-    cd demos/dataset_retrieval
-    python3 demo_dataset_creation.py
-```
-
-## Expected output
-
-The simulation will output some figures showing the contact forces history during the simulation, as the one reported below as example. 
-
-<!-- ![picture 1](../../images/Figure_1.png)-->
-
-![pic1](../../images/Figure_1.png)
+[Back to top](#trajectories_generation)

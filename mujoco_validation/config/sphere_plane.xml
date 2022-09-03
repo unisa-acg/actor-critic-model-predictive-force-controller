@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+    <mujoco>
+        <option timestep="0.002" />
+        <worldbody>
+            <body name="sphere" pos="0 0 3">
+                <geom mass = "5" size="1 1 1" type="sphere" condim = "1" solimp="0.99 0.99 0.01" solref="0.01 1" priority="0" name="sphere"/>
+                <joint axis="0 0 1" name="free_ball" type="free"/>
+            </body>
+            <body name="floor" pos="0 0 0">
+                <geom mass = "1" condim="1" size="5.0 5.0 1" rgba="0 1 0 1" type="box" solimp="0.99 0.99 0.01" solref="-100 -20" priority="1" name="floor"/>
+            </body>
+        </worldbody>
+    </mujoco>

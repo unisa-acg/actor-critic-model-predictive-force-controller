@@ -1,125 +1,69 @@
-# Introduction 
-<div id="top"></div>
+# mujoco_validation
 
-To be added...
+Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces.
+This method is validated in two different situations, as shown in the demos. These are based on the functions contained in the src folder.
 
-<b>Table of Contents</b>
+## Folders list
 
-* <a href="#getting-started">Getting Started</a>
-   * <a href="#prerequisites">Prerequisites</a>
-   * <a href="#installmujoco">Install Mujoco</a>
-   * <a href="#installmujocopy">Install Mujoco-Py</a>
-* <a href="#usage">Usage</a>
-* <a href="#listofpackages">List of Packages</a>
-* <a href="#componentrepos">Component Repos</a>
-
-# Getting Started
-This section explains how to setup the environment needed to launch the demos
-
-<!-- ----------------------------------------------------------------------- -->
-
-## Prerequisites 
-
-* [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
-* Git
-   ```sh
-   sudo apt install git
-   ```
-
-## Install MuJoCo 2.1.0
-<div id="installmujoco"></div>
-
-1. Download MuJoCo library from [MuJoCo website](https://mujoco.org/download/mujoco210-linux-x86_64.tar.gz)
-2. Create a hidden folder:
-   ```sh
-   mkdir /home/username/.mujoco
-   ```
-
-3. Extract the MuJoCo downloaded library into the hidden folder `.mujoco`
-4. Add these lines to the `.bashrc` file:
-   ```sh
-   export LD_LIBRARY_PATH=/home/user_name/.mujoco/mujoco210/bin #substitute username with your username
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
-   export PATH="$LD_LIBRARY_PATH:$PATH
-   ```
-
-5. Source the `.bashrc` file:
-   ```sh
-   source .bashrc
-   ```
-
-6. Test the installation:
-   ```sh
-   cd ~/.mujoco/mujoco210/bin
-   ./simulate ../model/humanoid.xml
-   ```
-
-## Install MuJoCo-Py
-<div id="installmujocopy"></div>
-
-1. Create and activate a Conda environment for MuJoCo-Py:
-   ```sh
-   conda create --name mujoco_py python=3.8
-   conda activate mujoco_py
-   ```
-
-2. Install the required packages:
-   ```sh
-   sudo apt update
-   sudo apt install patchelf
-   sudo apt install python3-dev build-essential libssl-dev libffi-dev libxml2-dev  
-   sudo apt install libxslt1-dev zlib1g-dev libglew1.5 libglew-dev python3-pip
-   ```
-
-3. Clone the MuJoCo-Py repository and install the required pip packages:
-   ```sh
-   git clone https://github.com/openai/mujoco-py
-   cd mujoco-py
-   pip3 install -r requirements.txt
-   pip3 install -r requirements.dev.txt
-   pip3 install -e . --no-cache
-   ```
-
-4. Reboot your pc
-5. Activate the Conda virtual environment and install MuJoCo-Py:
-   ```sh
-   conda activate mujoco_py
-   sudo apt install libosmesa6-dev libgl1-mesa-glx libglfw3
-   pip3 install -U 'mujoco-py<2.2,>=2.1' 
-   ```
-
-6. Test the installation:
-   ```sh
-   cd examples
-   python3 markers_demo.py
-   ```
-
-# Usage
-<div id="usage"></div>
-
-To be added...
-
-| Demo                                                                                                                                                  | Description                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| [Contact forces and info retrieval](/demos/contact_info_retrieval/Readme.md)                                                                                        | Example of different environments in which the cumulative contact forces between pair of bodies and the info (penetration, velcoity of deformation of the contact etc.) are stored in .csv file for later analysis |
-
-
-# List of Packages
-<div id="listofpackages"></div>
-
-| Package                                                                       | Functionality                                      |
+| Folder                                                                       | Contents                                      |
 | :------------------------------------------------------------------------- | :------------------------------------------------- |
-| MuJoCo Validation | Set of utilities to retrieve the contact info and forces happened during a simulation between each pair of bodies in contact |
-| MuJoCo Panda |  See <a href="#componentrepos">Component Repos</a> for more info   |
+| [demos](./demos) | Contain the examples of different environments in which the cumulative contact forces between pair of bodies are validated and the information (penetration, velocity of deformation of the contact etc.) are extracted from the simulation. |
+| [media](./doc/media) | Contain the images produced by the demos.|
+| [output](./output) | Contain the .csv files, in which, step by step, the contact information are stored. |
+| [src](./src) | Contain the utilities functions that allow the demo to work. |
 
-<!-- TODO: give link to each package folder -->
+## Demos
 
-# Component Repos
-<div id="componentrepos"></div>
+### Demo #1 - Sphere-plane simulation
 
-| Repo                                                                       | Functionality                                      |
-| :------------------------------------------------------------------------- | :------------------------------------------------- |
-| [Mujoco Panda](https://github.com/justagist/mujoco_panda) | Franka Emika Panda implementation for Mujoco. Provides also force, motion and hybrid force/motion controllers for the robot |
+#### Simulation description
 
+This demo consists in a sphere falling on a plane and resting on it. The aim of this simulation is to compare the forces retrieved by the _mujoco_validation_ module utilities, which exploit a reconstructed MuJoCo explicit model to calculate them, and compare the results with the built-in functions results, which are instead based on solving a convex optimization problem. Moreover, all the contact info at the current time step, such as penetration and velocity of deformation of each contact point, are appended to a .csv file.
+All the parameters of the simulation, like stiffness of the contact, mass of the sphere etc. are visible inside the XML model in the demo code.
 
-<p align="right">[<a href="#top">Back to top</a>]</p>
+#### How to launch it
+
+Clone the repository (if not done previously) and inside the main folder execute the following commands to source the environment and launch the demo:
+
+```sh
+roscd; cd ../src/
+cd environment_identification
+source set_env.sh
+cd mujoco_validation/demos
+python3 demo_sphere_plane_simulation.py
+```
+
+#### Expected output
+
+The simulation will output two figures showing the contact force history during the simulation, calculated with the explicit method and the built-in one. Moreover, the results for the contact info are stored in the _contact_data_simulation.csv_ file in the current working directory.
+For the default simulator parameters the output images will look like:
+
+Explicit Method             |  Built-in Method
+:-------------------------:|:-------------------------:
+![contact_force_sphere_floor_explicit](./doc/media/contact_force_sphere_floor_explicit.png)  |  ![contact_force_sphere_floor_built_in](./doc/media/contact_force_sphere_floor_built_in.png)
+
+### Demo #2 - Robot-plane simulation
+
+#### Simulation description
+
+This simulation consists in an environment composed of a Franka Emika Panda robot, with attached at the end-effector a sphere, coming in contact with a fixed plane. The robot is controlled via a hybrid force/motion controller that activates the force control when in proximity of the table. It tries to stabilize the force between the two bodies at $50$ $N$. As the previous simulation, all the infos about the forces acting in the contacts are plotted and stored, with all the other contact info at current step, in a .csv file.
+
+#### How to launch it
+
+Clone the repository (if not done previously) and inside the main folder execute the following commands to source the environment and launch the demo:
+
+```sh
+roscd; cd ../src/
+cd environment_identification
+source set_env.sh
+cd mujoco_validation/demos
+python3 demo_panda_sphere_simulation.py
+```
+
+#### Expected output
+
+The simulation will show the robot coming in contact and stabiling it, then the figures of the forces are plotted and all the info stored in the _contact_data_simulation.csv_ file in the current working directory. The two output figures in case of default simulation parameters will look something similar to the ones shown below.
+
+Explicit Method             |  Built-in Method
+:-------------------------:|:-------------------------:
+![contact_force_panda_table_explicit](./doc/media/contact_force_panda_table_explicit.png)  |  ![contact_force_panda_table_built_in](./doc/media/contact_force_panda_table_built_in.png)

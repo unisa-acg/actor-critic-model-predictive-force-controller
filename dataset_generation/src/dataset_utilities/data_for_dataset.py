@@ -38,17 +38,20 @@ class DataForDataset:
 
         self.ee_torque[self.ncalls_get_info_robot, :] = env.robots[0].ee_torque
 
-        self.ee_pos[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xpos(
-            bodies_name)
+        self.ee_pos[self.ncalls_get_info_robot, :] = env.sim.data.site_xpos[
+            env.sim.model.site_name2id(bodies_name)]
 
-        self.ee_vel[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xvelp(
-            bodies_name)
+        self.ee_vel[self.ncalls_get_info_robot, :] = env.sim.data.site_xvelp[
+            env.sim.model.site_name2id(bodies_name)]
 
-        self.ee_omg[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xvelr(
-            bodies_name)
+        self.ee_omg[self.ncalls_get_info_robot, :] = env.sim.data.site_xvelr[
+            env.sim.model.site_name2id(bodies_name)]
 
-        self.ee_ori[self.ncalls_get_info_robot, :] = quat_utils.quat2euler(
-            env.sim.data.get_body_xquat(bodies_name))
+        self.ee_quat = np.array(
+            env.sim.data.site_xmat[env.sim.model.site_name2id(bodies_name)].reshape(
+                [3, 3]))
+
+        self.ee_ori[self.ncalls_get_info_robot, :] = quat_utils.mat2euler(self.ee_quat)
 
         self.ncalls_get_info_robot += 1
 

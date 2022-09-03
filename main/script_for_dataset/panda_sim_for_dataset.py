@@ -14,6 +14,7 @@ from trajectories_generation.src.traj_resampler import TrajectoryResampler
 from dataset_generation.src.dataset_utilities.data_for_dataset import DataForDataset
 from dataset_generation.src.dataset_utilities.data_processing import DataProcessing
 from dataset_generation.src.utilities.sim_data_utilities import SimulationDataUtilities
+from dataset_generation.src.controller.admittance_controller_1d import AdmittanceController1D
 
 matplotlib.use('QtCairo')
 
@@ -81,7 +82,7 @@ def add_markers_op_zone(env, params_randomizer, table_pos_z):
 
 controller_config = load_controller_config(default_controller="OSC_POSE")
 controller_config['control_delta'] = False
-controller_config['impedance_mode'] = 'fixed'
+controller_config['impedance_mode'] = 'variable_kp'
 
 # create an environment to visualize on-screen
 env = suite.make(
@@ -106,18 +107,33 @@ env.reset_from_xml_string(xml_string)  # Reset the environment with the desired
 
 ####
 
+## Admittance controller settings
+# Data retrieval
+mass_matrix = env.robots[0].controller.mass_matrix
+J_pos = env.robots[0].controller.J_pos[2, :]
+# Data manipulation
+mass_matrix_inv = np.linalg.inv(mass_matrix)
+lambda_pos_inv = np.dot(np.dot(J_pos, mass_matrix_inv), J_pos.transpose())
+lambda_pos = 1 / lambda_pos_inv
+# Controller gains
+K_p = 1.5e-4  # Position gain
+K_d = 1.5e-3  # Velocity gain
+K_f = 8e-2  # Force gain
+
+## Class instantiation
+A = AdmittanceController1D(lambda_pos_inv, K_p, K_d, K_f)
 TG = TrajectoryGenerator()
 TR = TrajectoryResampler()
 DP = DataProcessing()
+SDU = SimulationDataUtilities(env.horizon)
 
 # Selection of the parameters
 num_traj = 1  # Number of trajectories
-ee_pos = env._eef_xpos  # End-effector position (point from which the
-# approach trajectory starts)
-table_pos = env.sim.model.body_pos[1]  # Table position (point in which the
-# approach trajectory finishes)
-gap = 0.072  # Gap added to table position to ensure minimal
-# penetration
+ee_pos = env._eef_xpos  # End-effector position (point from which the approach
+# trajectory starts)
+table_pos = env.sim.model.body_pos[1]  # Table position (point in which the approach
+# trajectory finishes)
+gap = 0.072  # Gap added to table position to ensure minimal penetration
 kp_pos = 150  # Gain of the position controller
 kp_f = 0.1  # Gain of the force controller
 old_time_step = 0.1  # Time step of the generated trajectory
@@ -158,32 +174,48 @@ for i in range(num_traj):
 
     # MAIN TRAJECTORY
     # Randomization of the parameters
-    steps_required = 1e6
-    while steps_required > 1e5:  # Maximum steps ammited
-        params_randomizer = {
-            'starting_point': (0, 0),
-            "operating_zone_points": [(-0.25, -0.25),
-                                      (0.25, 0.25)],  # il primo è y il secondo x
-            'max_n_subtraj': 4,
-            'max_vel': 0.02,
-            'max_radius': 0.1,
-            'min_radius': 0.01,
-            'max_ampl': 0.1,
-            'max_freq': 10,
-            'min_f_ref': 10,
-            'max_f_ref': 80,
-            'max_ampl_f': 20,
-            'max_freq_f': 10,
-        }
+    # steps_required = 1e6
+    # while steps_required > 1e5:  # Maximum steps ammited
+    #     params_randomizer = {
+    #         'starting_point': (0, 0),
+    #         "operating_zone_points": [(-0.25, -0.25),
+    #                                   (0.25, 0.25)],  # il primo è y il secondo x
+    #         'max_n_subtraj': 4,
+    #         'max_vel': 0.02,
+    #         'max_radius': 0.1,
+    #         'min_radius': 0.01,
+    #         'max_ampl': 0.1,
+    #         'max_freq': 10,
+    #         'min_f_ref': 10,
+    #         'max_f_ref': 80,
+    #         'max_ampl_f': 20,
+    #         'max_freq_f': 10,
+    #     }
 
-        # Parameters definition
-        [
-            waypoints, traj_timestamps, traj_types, traj_params, force_reference_types,
-            force_reference_parameters
-        ] = R.traj_randomizer(params_randomizer)
+    #     # Parameters definition
+    #     [
+    #         waypoints, traj_timestamps, traj_types, traj_params, force_reference_types,
+    #         force_reference_parameters
+    #     ] = R.traj_randomizer(params_randomizer)
 
-        steps_required = (traj_timestamps[-1] + 6) / 0.002
-    print('Steps required: ', steps_required)
+    #     steps_required = (traj_timestamps[-1] + 6) / 0.002
+    # print('Steps required: ', steps_required)
+
+    #Main trajectories
+    waypoints = [(table_pos[0], table_pos[1]), (-0.2, 0), (table_pos[0], table_pos[1])]
+    #traj_types = ['line', 'circle', 'line', 'sine_curve']
+    traj_types = ['line']
+    #traj_params = [None, 0.1, None, [0.1, 3]]
+    traj_params = [None]
+    traj_timestamps = [0, 10]
+    # force_reference_types = ['cnst']
+    # force_reference_parameters = [20]
+    force_reference_types = ['sine_curve']
+    force_reference_parameters = [[75, 20, 20, 5]]
+
+    params_randomizer = {
+        "operating_zone_points": [(-0.25, -0.25), (0.25, 0.25)]
+    }  # il primo è y il secondo x
 
     # Trajectory generation
     [x, y, f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,
@@ -219,8 +251,10 @@ for i in range(num_traj):
     smooth_ft_buffer = []
     smooth_ft_buffer.append(np.array([0, 0, 0, 0, 0, 0]))
 
+    # Modification of the table stiffness keeping it critically damped
+    env.sim.model.geom_solref[7][0] = 0.1
     # Modification of frictions
-    env.sim.model.geom_friction[7] = [0, 0, 0]  # default[1.0, 0.005, 0.0001]
+    env.sim.model.geom_friction[7] = [0, 0, 0]
     env.sim.model.geom_friction[30] = [0, 0, 0]
 
     # TRAJECTORY BUILDING
@@ -248,56 +282,76 @@ for i in range(num_traj):
     # Final reference force
     force_ref = np.concatenate((force_app, np.array(dframe[:, 2], dtype=np.float64)))
 
+    # Last class instantiation
     DFD = DataForDataset(len(target_traj))
-    SDU = SimulationDataUtilities(env.horizon)
 
     # Trajectory execution
     for ii in range(len(target_traj)):
-        controller = env.robots[0].controller  # Access to robot controller
         SDU.contact_forces(env, 'table_collision', 'ee_sphere_collision')
 
+        # Force smoothing
         smooth_ft_buffer.append(np.array(env.sim.data.sensordata))
         if len(smooth_ft_buffer) > 5:
             smooth_ft_buffer.pop(0)
         force_vals = np.mean(np.asarray(smooth_ft_buffer).copy(), 0)
 
-        # Force controller activation along z-direction
-        if env.check_contact('ee_sphere_collision', 'table_collision') or flag == 1:
-            controller.activate_pid_z = True
-            controller.fs = force_vals[2]
-
-            controller.f_target = force_ref[ii]
-            controller.kp_pid = 0.08  #0.3
-            controller.kd_pid = 350
-            controller.ki_pid = 0.001  #0.001
+        # Activation of the admittance controller only when the end-effector impact the table
+        if env.check_contact('ee_sphere_collision', 'table_collision'):
             flag = 1
 
+        if flag == 1:
+            f_d = force_ref[ii]  # Reference force
+            x_d = target_traj[ii, 2]  # Reference position
+            A.set_reference(x_d, f_d)  # Setpoint for u_h in form [x_d, f_d]
+
+            pos_along_z = env.sim.data.site_xpos[env.sim.model.site_name2id(
+                'gripper0_grip_site')][
+                    2]  # Actual position of the end-effector along z-axis
+            vel_along_z = env.sim.data.site_xvelp[env.sim.model.site_name2id(
+                'gripper0_grip_site')][
+                    2]  # Actual velocity of the end-effector along z-axis
+
+            u_h = A.update(force_vals[2], (pos_along_z, vel_along_z), new_time_step
+                          )  # Next z position identified by the admittance controller
+
+        # Effective target trajectory
+        if flag == 1:  # After the contact the target position along z, given to the position controller, is selected by the admittance controller (u_h)
+            traj = np.array([target_traj[ii, 0], target_traj[ii, 1], u_h])
+            kp_pos = 150 * 1e4
+            KP = np.array([150, 150, kp_pos, 150, 150, 150])
+        else:
+            traj = np.array(target_traj[ii, :])
+            kp_pos = 150
+            KP = np.array([150, 150, kp_pos, 150, 150, 150])
+
+        pose = np.append(traj, np.array([0, -np.pi, 0]))
+        action = np.append(KP, pose)
+        env.step(
+            action)  # Action performed by the position controller at the actual step
+
         # Contact information recording for the final dataset
-        if ii == len(df_approach) + 600 or flag_dataset == 1:  # This condition allows
-            # to avoid the oscillating data coming from the impact during the
-            # approaching trajectory
-            DFD.get_info_robot(env, 'robot0_right_hand')
+        if ii == len(
+                df_approach
+        ) + 600:  # This condition allows to avoid the recording of the oscillating data coming from the impact during the approaching trajectory
             flag_dataset = 1
+            k = ii
+        if flag_dataset == 1:
+            DFD.get_info_robot(env, 'gripper0_grip_site')
 
-        action = np.append(target_traj[ii, :], np.array([0, -np.pi, 0]))
-        env.step(action)  # Actual action of the step
-
+        # Saving of the smoothed force
         force_sensor.append(force_vals[2])
         i_dis.append(ii)
 
         SDU.get_info_robot(
-            env, 'robot0_right_hand')  # Contact information recording for the plots
+            env, 'gripper0_grip_site')  # Contact information recording for the plots
 
         add_markers_op_zone(env, params_randomizer, table_pos[2])
 
-        env.render()
+        # env.render()
 
     # After each trajectory an environment reset is done to restart from the neutral
     # pose
     env.reset_from_xml_string(xml_string)
-
-    controller.integral = 0
-    controller.activate_pid_z = False
 
     # Output generation
     SDU.plot_contact_forces()
@@ -310,12 +364,19 @@ for i in range(num_traj):
 
     # Smoothed force plotted
     plt.figure()
-    plt.plot(i_dis, force_sensor)
+    plt.axvline(x=k, linestyle='dashed', color='red')
+    plt.plot(i_dis, force_sensor, color='#125488')
+    plt.legend(['Step when recording starts'])
+    plt.xlabel('steps')
+    plt.ylabel('[N]')
+    plt.title('Smoothed force from sensor')
+    plt.grid()
 
 DP.combine_trajectory_csv(csv_unproc_path, False)
 csv_proc_path = 'output/processed_csv/processed_{}'.format(now)
 csv_proc_name = 'sim_data_proc.csv'
-DP.contact_info_processed_to_csv(csv_proc_name,
-                                 csv_proc_path)  # Creation of the dataset
+csv_norm_data_name = 'norm_data.csv'  # data for the dataset normalization and viceversa
+DP.contact_info_processed_to_csv(csv_proc_name, csv_proc_path,
+                                 csv_norm_data_name)  # Creation of the dataset
 DP.plot_data_comparison()
 plt.show()

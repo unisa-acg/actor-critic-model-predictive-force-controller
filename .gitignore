@@ -1,4 +1,5 @@
 *.vscode*
+*.pyc
 .DS_Store
 
 environment_identification.code-workspace

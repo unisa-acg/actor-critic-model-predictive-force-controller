@@ -80,8 +80,8 @@ class DataForDataset:
         force_output = ['f_x_out', 'f_y_out', 'f_z_out']
         torque_output = ['torque_x_out', 'torque_y_out', 'torque_z_out']
 
-        # fieldnames = pos + ori + vel + omg + delta + force + torque + force_output + torque_output
-        fieldnames = pos + ori + vel + omg + delta_pos + delta_ori + force_output + torque_output
+        fieldnames = (pos + ori + vel + omg + delta_pos + delta_ori + force_output +
+                      torque_output)
 
         force = np.stack(
             (
@@ -103,20 +103,17 @@ class DataForDataset:
         ],
                              dtype=np.float64)
 
-        self.robot_info = np.concatenate(
-            (
-                self.ee_pos[:self.ncalls_get_info_robot - 1, :],
-                self.ee_ori[:self.ncalls_get_info_robot - 1, :],
-                self.ee_vel[:self.ncalls_get_info_robot - 1, :],
-                self.ee_omg[:self.ncalls_get_info_robot - 1, :],
-                delta_pos[:self.ncalls_get_info_robot - 1, :],
-                delta_ori[:self.ncalls_get_info_robot - 1, :],
-                #force[:self.ncalls_get_info_robot-1, :],
-                #self.ee_torque[:self.ncalls_get_info_robot-1, :],
-                force[1:self.ncalls_get_info_robot, :],
-                self.ee_torque[1:self.ncalls_get_info_robot, :],
-            ),
-            axis=1)
+        self.robot_info = np.concatenate((
+            self.ee_pos[:self.ncalls_get_info_robot - 1, :],
+            self.ee_ori[:self.ncalls_get_info_robot - 1, :],
+            self.ee_vel[:self.ncalls_get_info_robot - 1, :],
+            self.ee_omg[:self.ncalls_get_info_robot - 1, :],
+            delta_pos[:self.ncalls_get_info_robot - 1, :],
+            delta_ori[:self.ncalls_get_info_robot - 1, :],
+            force[1:self.ncalls_get_info_robot, :],
+            self.ee_torque[1:self.ncalls_get_info_robot, :],
+        ),
+                                         axis=1)
 
         with open(csv_full_path, "a") as f:
             writer = csv.writer(f)

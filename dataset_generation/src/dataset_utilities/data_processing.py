@@ -8,8 +8,10 @@ import glob
 
 class DataProcessing:
     """
-    Class that contains method to manipulate the data stored in the folder 'csv_folder' (normalization and Gaussian noise addition) and store them in .csv files.
-    This dataset will be used to train the neural network whose task is to learn the forces produced by the robot-environment contact.
+    Class that contains method to manipulate the data stored in the folder 'csv_folder' 
+    (normalization and Gaussian noise addition) and store them in .csv files.
+    This dataset will be used to train the neural network whose task is to learn the 
+    forces produced by the robot-environment contact.
     """
 
     def combine_trajectory_csv(self, csv_dir_path, processed=True):
@@ -52,11 +54,13 @@ class DataProcessing:
         std = self.robot_info.std(0)
         noise = np.random.normal(0, 0.05 / 3 / std[20], len(self.robot_info))
 
-        #self.robot_info_processed = (self.robot_info - mean)/std
-
-        self.robot_info_processed = (
-            ((self.robot_info - mean) / std).transpose() +
-            noise).transpose()  #mean = 0, std = 1, Gaussian noise N(0, 0.005)
+        # Processing output: mean = 0, std = 1, Gaussian noise N(0, 0.05N)
+        self.robot_info_processed = np.concatenate((
+            (self.robot_info[:, :18] - mean[:18]) / std[:18],
+            (((self.robot_info[:, 18:] - mean[18:]) / std[18:]).transpose() +
+             noise).transpose(),
+        ),
+                                                   axis=1)
 
         with open(csv_full_path, "a") as f:
             writer = csv.writer(f)
@@ -74,7 +78,8 @@ class DataProcessing:
         g.close()
 
     def plot_data_comparison(self):
-        """Plot the information registered vs the information processed. Only the data subsequently used are plotted and not all the data contained in the .csv file.
+        """Plot the information registered vs the information processed. Only the data 
+        subsequently used are plotted and not all the data contained in the .csv file.
         After calling contact_info_processed_to_csv() method.
         
         Returns:

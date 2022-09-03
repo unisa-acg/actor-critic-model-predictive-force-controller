@@ -4,32 +4,9 @@ import numpy as np
 
 class AdmittanceController1D():
     """
-    This class inherits from controllers.BaseController. It represents a 
-    unidimensional position controller with a force-feedback loop. 
+    It represents a unidimensional position controller with a force-feedback loop. 
     Assume that every variable is within end-effector frame, a.k.a.
     a detached end-effector with a moving reference frame.
-    
-    Refer to the report for further information.
-
-    Superclass variables
-    --------------------
-    feedback_shape : (1,)
-        Only the force is fed back.
-    control_shape : (1,)
-        A position reference is sent to the robot.
-    reference_shape : (2, 1)
-        A position and a force reference are given to the robot.
-
-    Internal variables
-    ------------------
-    x_d : np.ndarray
-        1d-array with the reference position
-    f_d : np.ndarray
-        1d-array with the reference force
-    x_c : np.ndarray
-        1d-array with the controled position variable
-    f_e : np.ndarray
-        1d-array with the force exerted by the robot over the environment
     """
 
     def __init__(self, M_d_inv, K_P, K_D, K_F):
@@ -42,14 +19,13 @@ class AdmittanceController1D():
             1d-array with the spring constant
         K_D : np.matrix
             1d-array with the damping constant    
+        K_F : np.matrix
+            1d-array with the force gain  
         """
         self.M_d_inv = M_d_inv
         self.K_P = K_P
         self.K_D = K_D
         self.K_F = K_F
-        # super(AdmittanceController1D, self).__init__(feedback_shape=(1,),
-        #                                              control_shape=(1,),
-        #                                              reference_shape=(2, 1))
         self.reset()
 
     def set_reference(self, reference_pos, reference_force):
@@ -95,10 +71,6 @@ class AdmittanceController1D():
         self.f_e = force
         self.x_c, self.x_c_dot = feedback
 
-        # Force error
-        # delta_f = np.transpose(
-        #     np.expand_dims(np.array([self.f_d - self.f_e], dtype=np.float64), axis=1))
-
         delta_f = self.K_F * (self.f_e - self.f_d)
         delta_pos = self.K_P * (self.x_c - self.x_d)
         delta_vel = self.K_D * self.x_c_dot
@@ -113,9 +85,4 @@ class AdmittanceController1D():
         return self.x_c
 
     def reset(self):
-        # self.f_d = np.zeros(self.feedback_shape)
-        # self.f_e = np.zeros(self.feedback_shape)
-        # self.x_d = np.zeros(self.control_shape)
-        # self.x_c = np.zeros(self.control_shape
         self.x_dot_c = 0
-        # self.x_dot_dot_c = np.zeros(self.control_shape)

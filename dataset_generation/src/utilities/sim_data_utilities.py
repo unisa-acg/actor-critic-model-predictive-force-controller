@@ -37,7 +37,8 @@ class SimulationDataUtilities:
         """It extracts the useful data from the simulation
 
         Args:
-            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
+            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo 
+            simulation instance at current timestep)
             bodies_name: name of the bodies whose contact data need to be obtained 
         """
         self.ee_force[self.ncalls_get_info_robot, :] = env.robots[0].ee_force
@@ -72,11 +73,15 @@ class SimulationDataUtilities:
         self.ncalls_get_info_robot += 1
 
     def contact_forces(self, env, geom1_name, geom2_name):
-        """Substitute function to the heavy contact_forces(), which can slow down simulation times. It implements the built in methods to retrieve the forces even in presence of friction. Stores them in the class in order to plot them.
+        """Substitute function to the heavy contact_forces(), which can slow down 
+        simulation times. It implements the built in methods to retrieve the forces even 
+        in presence of friction. Stores them in the class in order to plot them.
 
         Args:
-            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
-            geom1_name, geom2_name: name of the geometries whose mutual contact you want to check
+            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo 
+            simulation instance at current timestep)
+            geom1_name, geom2_name: name of the geometries whose mutual contact you want 
+            to check
         """
         sim = env.sim
 
@@ -97,7 +102,9 @@ class SimulationDataUtilities:
         self.ncalls += 1
 
     def plot_contact_forces(self):
-        """plot the forces directions and the total magnitude, as well as the penetration data, happened between the pair of bodies specified in ``contact_forces()``. Must be called AFTER ``contact_forces()`` method
+        """plot the forces directions and the total magnitude, as well as the 
+        penetration data, happened between the pair of bodies specified in 
+        ``contact_forces()``. Must be called AFTER ``contact_forces()`` method
 
         Returns:
             fig
@@ -158,7 +165,8 @@ class SimulationDataUtilities:
         return
 
     def plot_torques(self):
-        """plot the torques of the robot frames. Must be called AFTER ``get_info_robot()`` method
+        """plot the torques of the robot frames. Must be called AFTER 
+        ``get_info_robot()`` method
 
         Returns:
             fig
@@ -184,7 +192,8 @@ class SimulationDataUtilities:
         return
 
     def plot_ee_pos_vel(self):
-        """plot the position and velocity of the robot end-effector. Must be called AFTER ``get_info_robot()`` method
+        """plot the position and velocity of the robot end-effector. Must be called 
+        AFTER ``get_info_robot()`` method
         Returns:
             fig
         """

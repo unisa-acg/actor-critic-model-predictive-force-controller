@@ -8,12 +8,32 @@ This section explains how to setup the environment needed to launch the demos.
 
 ### Prerequisites
 
-* [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
+<!-- * [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 * Git
 
    ```sh
    sudo apt install git
-   ```
+   ``` -->
+
+sudo apt install python3.8-venv
+
+Create [venv](https://linuxhint.com/python-virtualenv-tutorial/) 
+```
+python3 -m venv venv
+
+Activate venv
+
+source venv/bin/activate
+
+Use to install any package inside the virtual environment that must be activate FIRST
+python3 -m pip install <package-name>
+
+robosuite 
+termcolor
+numpy <1.24
+matplotlib
+torch
+
 
 * Pip
 
@@ -87,7 +107,7 @@ Clone environment_identification repository
    git clone https://bitbucket.org/unisa-polimi-idsia/environment_identification/
    ```
 
-### Clone robosuite
+<!-- ### Clone robosuite
 
 Robosuite is a simulation framework powered by the MuJoCo physics engine that offers a suite of benchmark environments.
 
@@ -118,7 +138,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
    conda create --name env_identification
    conda activate env_identification
    pip install -r requirements.txt
-   ```
+   ``` -->
 
 ## List of Modules
 
@@ -127,7 +147,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
 | [MuJoCo Validation](/mujoco_validation) | Retrieve the contact info and forces happened during a simulation between each pair of bodies in contact and validate the built-in method that computes the contact forces. |
 | [Trajectory Generation](/trajectory_generation) | Provide a pipeline to retrieve customizable 2D trajectories, keeping track of the various steps through .csv files. |
 | [Dataset Generation](/dataset_generation) | Provide a module to retrieve the useful data from the simulations and process them in oder to generate a .csv dataset able to train a neural network. |
-| [Main](/main) | Contains the main scripts used fo this repository. |
+| [Main](/main) | Contains the main scripts used for this repository. |
 
 ## Authors
 

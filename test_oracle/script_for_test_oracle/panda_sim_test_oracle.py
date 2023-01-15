@@ -5,21 +5,20 @@ import numpy as np
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib
-from traj_gen import TrajectoryGenerator
-from traj_resampler import TrajectoryResampler
-from data_processing import DataProcessing
-from sim_data_utilities import SimulationDataUtilities
-from data_for_dataset import DataForDataset
-from force_controller import ForceController
+from trajectories_generation_utilities.src.traj_gen import TrajectoryGenerator
+from trajectories_generation_utilities.src.traj_resampler import TrajectoryResampler
+from dataset_generation_utilities.src.dataset_utilities.data_processing import DataProcessing
+from dataset_generation_utilities.src.dataset_utilities.data_for_dataset import DataForDataset
+from dataset_generation_utilities.src.PI_force_controller.force_controller import ForceController
+from utilities.src.sim_data_utilities import SimulationDataUtilities
 from datetime import datetime
 from torchensemble.utils import io
 from torchensemble import (FusionRegressor, GradientBoostingRegressor,
                            SnapshotEnsembleRegressor, VotingRegressor,
                            AdversarialTrainingRegressor)
-import nn_utilities_bit as nn_utils
+import force_estimator_utilities.src.nn_utilities_bit as nn_utils
+import utilities.src.plot_utils as plot_utils
 import torch
-from force_controller import ForceController
-import plot_utils
 
 matplotlib.use('QtCairo')
 

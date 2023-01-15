@@ -1,22 +1,24 @@
 import csv
 import os.path
-import dataset_generation.src.utilities.quat_utils as quat_utils
+import utilities.src.quat_utils as quat_utils
 import numpy as np
 
 
 class DataForDataset:
     """
-    Class that contains method to plot and store in .csv files the info happening during 
-    the MuJoCo simulation for the creation of the dataset. 
+    Class that contains method to plot and store in .csv files the info happening during the MuJoCo simulation for the creation of the dataset. 
     The data from the simulation are stored in a folder selected by the user.
+
+    Methods
+    -------
+    * __init__(steps): instantiate the variables need for the other methods
+
+    * get_info_robot(env, bodies_name): it extracts the useful data from the simulation
+
+    * contact_info_to_csv(csv_file_path): after calling get_info_robot() method, stores all the contact information registered during the simulation into a .csv file in the specified folder
     """
 
     def __init__(self, steps):
-        """Instantiate the variables need for the other methods.
-
-        Args:
-            steps: number of total simulation steps 
-        """
         self.ee_pos = np.zeros((steps, 3), dtype=np.float64, order="C")
         self.ee_ori = np.zeros((steps, 3), dtype=np.float64, order="C")
         self.ee_vel = np.zeros((steps, 3), dtype=np.float64, order="C")
@@ -26,40 +28,48 @@ class DataForDataset:
 
         self.ncalls_get_info_robot = 0
 
-    def get_info_robot(self, env, bodies_name):
+    def get_info_robot(self, env, bodies_name, smoothed_force_z, u_h):
         """It extracts the useful data from the simulation
 
         Args:
-            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo 
-            simulation instance at current timestep)
+            env: MuJoCo environment from which allows access to sim (mjSim -> MuJoCo simulation instance at current timestep)
             bodies_name: name of the bodies whose contact data need to be obtained 
         """
         self.ee_force[self.ncalls_get_info_robot, :] = env.robots[0].ee_force
 
+        self.ee_force[self.ncalls_get_info_robot, 2] = smoothed_force_z
+
         self.ee_torque[self.ncalls_get_info_robot, :] = env.robots[0].ee_torque
 
-        self.ee_pos[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xpos(
-            bodies_name)
+        self.ee_pos[self.ncalls_get_info_robot, :] = env.sim.data.site_xpos[
+            env.sim.model.site_name2id(bodies_name)]
 
-        self.ee_vel[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xvelp(
-            bodies_name)
+        self.ee_pos[self.ncalls_get_info_robot, 2] = u_h
 
-        self.ee_omg[self.ncalls_get_info_robot, :] = env.sim.data.get_body_xvelr(
-            bodies_name)
+        self.ee_vel[self.ncalls_get_info_robot, :] = env.sim.data.site_xvelp[
+            env.sim.model.site_name2id(bodies_name)]
 
-        self.ee_ori[self.ncalls_get_info_robot, :] = quat_utils.quat2euler(
-            env.sim.data.get_body_xquat(bodies_name))
+        self.ee_omg[self.ncalls_get_info_robot, :] = env.sim.data.site_xvelr[
+            env.sim.model.site_name2id(bodies_name)]
+
+        self.ee_quat = np.array(
+            env.sim.data.site_xmat[env.sim.model.site_name2id(bodies_name)].reshape(
+                [3, 3]))
+
+        self.ee_ori[self.ncalls_get_info_robot, :] = quat_utils.mat2euler(self.ee_quat)
 
         self.ncalls_get_info_robot += 1
 
-    def contact_info_to_csv(self, csv_name, csv_dir_path):
-        """After calling get_info_robot() method, prints the contact data into .csv 
-        files in the folder csv_folder
+    def contact_info_to_csv(self,
+                            csv_name,
+                            csv_dir_path,
+                            trans_factor,
+                            keep_traj=False):
+        """After calling get_info_robot() method, prints the contact data into .csv files in the folder csv_folder
 
         Args:
             csv_file_path: path of the .csv file where the data will be saved
         """
-
         csv_full_path = os.path.join(csv_dir_path, csv_name)
 
         # Check if directory exists, otherwise create it
@@ -77,7 +87,6 @@ class DataForDataset:
         force_output = ['f_x_out', 'f_y_out', 'f_z_out']
         torque_output = ['torque_x_out', 'torque_y_out', 'torque_z_out']
 
-        # fieldnames = pos + ori + vel + omg + delta + force + torque + force_output + torque_output
         fieldnames = pos + ori + vel + omg + delta_pos + delta_ori + force_output + torque_output
 
         force = np.stack(
@@ -100,18 +109,22 @@ class DataForDataset:
         ],
                              dtype=np.float64)
 
+        vel_z = np.array([(self.ee_pos[i + 1, 2] - self.ee_pos[i, 2]) / 0.01
+                          for i in range(len(self.ee_pos) - 1)],
+                         dtype=np.float64)
+        self.ee_vel[:-1, 2] = vel_z
         self.robot_info = np.concatenate(
             (
-                self.ee_pos[:self.ncalls_get_info_robot - 1, :],
-                self.ee_ori[:self.ncalls_get_info_robot - 1, :],
-                self.ee_vel[:self.ncalls_get_info_robot - 1, :],
-                self.ee_omg[:self.ncalls_get_info_robot - 1, :],
-                delta_pos[:self.ncalls_get_info_robot - 1, :],
-                delta_ori[:self.ncalls_get_info_robot - 1, :],
-                #force[:self.ncalls_get_info_robot-1, :],
-                #self.ee_torque[:self.ncalls_get_info_robot-1, :],
-                force[1:self.ncalls_get_info_robot, :],
-                self.ee_torque[1:self.ncalls_get_info_robot, :],
+                self.ee_pos[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                self.ee_ori[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                self.ee_vel[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                self.ee_omg[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                delta_pos[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                delta_ori[:self.ncalls_get_info_robot - 1 - trans_factor, :],
+                force[trans_factor:self.ncalls_get_info_robot - 1, :],
+                self.ee_torque[trans_factor:self.ncalls_get_info_robot - 1, :],
+                # force[1:self.ncalls_get_info_robot, :],
+                # self.ee_torque[1:self.ncalls_get_info_robot, :],
             ),
             axis=1)
 

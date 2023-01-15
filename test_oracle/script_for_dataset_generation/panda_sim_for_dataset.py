@@ -6,14 +6,13 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
 import matplotlib
-from traj_gen import TrajectoryGenerator
-from traj_resampler import TrajectoryResampler
-from data_processing import DataProcessing
-from sim_data_utilities import SimulationDataUtilities
-from data_for_dataset import DataForDataset
-import randomizer as R
-
-from force_controller import ForceController
+from trajectories_generation_utilities.src.traj_gen import TrajectoryGenerator
+from trajectories_generation_utilities.src.traj_resampler import TrajectoryResampler
+import trajectories_generation_utilities.src.randomizer as R
+from dataset_generation_utilities.src.dataset_utilities.data_processing import DataProcessing
+from dataset_generation_utilities.src.dataset_utilities.data_for_dataset import DataForDataset
+from dataset_generation_utilities.src.PI_force_controller.force_controller import ForceController
+from utilities.src.sim_data_utilities import SimulationDataUtilities
 
 matplotlib.use('QtCairo')
 
@@ -189,7 +188,7 @@ for i in range(num_traj):
         ] = R.traj_randomizer(params_randomizer)
 
         steps_required = (traj_timestamps[-1] + 6) / 0.002
-    print('Steps required: ', steps_required)
+    print('Trajectory ', i + 1, '--> steps required: ', steps_required)
 
     # Trajectory generation
     [x, y, f] = TG.traj_gen(waypoints, traj_types, traj_params, traj_timestamps,

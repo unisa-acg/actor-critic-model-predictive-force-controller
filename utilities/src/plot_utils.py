@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from mpl_toolkits import axes_grid1
 
 
 def plot_explored_space_3D(x, y, f, elev=None, azim=None, vmax=None, vmin=None):

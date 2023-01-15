@@ -13,3 +13,14 @@ mujoco_validation/output/contact_data_simulation*.csv
 main/script_for_dataset/sim_model_mod.xml
 main/script_for_dataset/sim_model.xml
 main/script_for_dataset/output
+test_oracle/script_for_nn_training/output
+test_oracle/script_for_nn_training/logs
+test_oracle/script_for_test_oracle/output
+test_oracle/script_for_test_oracle/sim_model_mod.xml
+test_oracle/script_for_test_oracle/sim_model.xml
+test_oracle/script_for_dataset_generation/logs
+test_oracle/script_for_dataset_generation/output
+test_oracle/script_for_nn_training/sim_model_mod.xml
+test_oracle/script_for_nn_training/sim_model.xml
+test_oracle/script_for_dataset_generation/sim_model_mod.xml
+test_oracle/script_for_dataset_generation/sim_model.xml

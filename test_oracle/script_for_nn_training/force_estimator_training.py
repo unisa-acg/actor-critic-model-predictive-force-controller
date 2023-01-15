@@ -5,14 +5,9 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import time
 from datetime import datetime
-import nn_utilities_bit as nn_utils
-import plot_utils
+import force_estimator_utilities.src.nn_utilities_bit as nn_utils
+import utilities.src.plot_utils as plot_utils
 from torchensemble.utils.logging import set_logger
-from torchensemble import (FusionRegressor, GradientBoostingRegressor,
-                           SnapshotEnsembleRegressor, VotingRegressor,
-                           AdversarialTrainingRegressor)
-
-from torch.utils.tensorboard import SummaryWriter
 
 
 # Function to extract the data position from the dataset
@@ -69,12 +64,12 @@ ensemble.set_optimizer(
     weight_decay=weight_decay  # parameter optimizer
 )  # learning rate of the optimizer
 
-save_dir = 'output/NN_trained/nn_saved_{}'  # Folder where the trained nn will be saved
+now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+
+save_dir = 'output/nn_saved_{}'.format(now)  # Folder where the trained nn will be saved
 # Check if directory exists, otherwise create it
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
-
-now = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
 # Import dataset and normalization file
 csv_files_path = 'example_data/sim_data_proc_example.csv'
@@ -119,7 +114,7 @@ ensemble.fit(
     epochs=epochs,
     test_loader=test_loader,
     save_model=True,
-    save_dir=save_dir.format(now))  # the number of training epochs
+    save_dir=save_dir)  # the number of training epochs
 
 # Evaluating
 ensemble.eval()

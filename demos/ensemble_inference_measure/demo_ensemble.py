@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from model_approximator.src.nn_utilities import create_ensemble, measure_inference
+import force_estimator_utilities.src.nn_utilities_bit as nn_utils
 
 # This demo serves the purpose to show how to instatiate easily an ensemble model,
 # train it and measure inference time
@@ -9,7 +9,9 @@ from model_approximator.src.nn_utilities import create_ensemble, measure_inferen
 def set_nn_properties(model):
     model.set_criterion(nn.MSELoss())
     model.set_optimizer(
-        "Adam", lr=0.01, weight_decay=5e-4  # parameter optimizer
+        "Adam",
+        lr=0.01,
+        weight_decay=5e-4  # parameter optimizer
     )  # learning rate of the optimizer
     return model
 
@@ -46,13 +48,13 @@ ensemble_dict_snapshot = {
 }
 
 # Base estimator and Ensemble instantiation
-base_estimator, ensemble_fusion = create_ensemble(
-    base_estimator_dict, ensemble_dict_fusion
-)
+base_estimator, ensemble_fusion = nn_utils.create_ensemble(base_estimator_dict,
+                                                           ensemble_dict_fusion)
 
-_, ensemble_voting = create_ensemble(base_estimator_dict, ensemble_dict_voting)
+_, ensemble_voting = nn_utils.create_ensemble(base_estimator_dict, ensemble_dict_voting)
 
-_, ensemble_snapshot = create_ensemble(base_estimator_dict, ensemble_dict_snapshot)
+_, ensemble_snapshot = nn_utils.create_ensemble(base_estimator_dict,
+                                                ensemble_dict_snapshot)
 
 nn_list = [base_estimator, ensemble_fusion, ensemble_voting, ensemble_snapshot]
 nn_names = ["Base estimator", "Fusion ensemble", "Voting ensemble", "Snapshot ensemble"]
@@ -62,7 +64,7 @@ inference_time = [None] * len(nn_names)
 
 for i in range(len(nn_list)):
     set_nn_properties(nn_list[i])
-    inference_time[i], _ = measure_inference(nn_list[i], is_trained=False)
+    inference_time[i], _ = nn_utils.measure_inference(nn_list[i], is_trained=False)
 
 for i in range(len(nn_list)):
     print(nn_names[i], "mean inference time:", inference_time[i], " milliseconds")

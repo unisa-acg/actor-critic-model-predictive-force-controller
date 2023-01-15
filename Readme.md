@@ -137,7 +137,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
 
 ## Usage
 
-Refer to the Readme.md in the [Main](/main) folder.
+Refer to the Readme.md in the [Main](/main_oracle) folder.
 
 <!-- ## List of Modules
 

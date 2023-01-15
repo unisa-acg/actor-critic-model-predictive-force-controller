@@ -12,7 +12,7 @@ Make sure you have followed the instructions in [getting started](../../Readme.m
     cd 
     cd environment_identification
     source set_env.sh
-    cd test_oracle/script_for_nn_training
+    cd main_oracle/script_for_nn_training
     python3 force_estimator_training.py
 ```
 

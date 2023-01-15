@@ -17,7 +17,7 @@ Make sure you have followed the instructions in [getting started](../../Readme.m
     cd 
     cd environment_identification
     source set_env.sh
-    cd test_oracle/script_for_dataset_generation
+    cd main_oracle/script_for_dataset_generation
     python3 panda_sim_for_dataset.py
 ```
 

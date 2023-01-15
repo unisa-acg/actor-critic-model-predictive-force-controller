@@ -10,17 +10,18 @@ This script requires a trained neural networks ensemble and a normalization file
 
 ## How to launch it
 
-Make sure you have followed the instructions in [getting started](../../Readme.md)
+Make sure you have followed the instructions in [getting started](../../Readme.md) before launching the following instructions.
+The following lines will launch the test simulation and output the result of the ORACLE usage, together with the regularizers usage descripted in the paper.
 
 ```sh
     cd 
     cd environment_identification
     source set_env.sh
-    cd test_oracle/script_for_test_oracle
+    cd main_oracle/script_for_test_oracle
     python3 panda_sim_test_oracle.py
 ```
 
-## Expected output
+## Expected output of test ORACLE
 
 The simulation will generate two main outputs: eleven figures and two .csv files.
 The figures represent:

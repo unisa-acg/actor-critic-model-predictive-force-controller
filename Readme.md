@@ -33,6 +33,10 @@ termcolor
 numpy <1.24
 matplotlib
 torch
+pandas
+mujoco-py
+
+#Fai freeze dell' environment su macchina nuova
 
 
 * Pip
@@ -78,7 +82,7 @@ MuJoCo is a physics engine that aims to facilitate research where fast and accur
 4. Add these lines to the `.bashrc` file:
 
    ```sh
-   export LD_LIBRARY_PATH=$HOME/.mujoco/mujoco210/bin #substitute username with your username
+   export LD_LIBRARY_PATH=$HOME/username/.mujoco/mujoco210/bin #substitute username with your username
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so
    export PATH="$LD_LIBRARY_PATH:$PATH"

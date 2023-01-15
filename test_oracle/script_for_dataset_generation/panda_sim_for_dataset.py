@@ -105,7 +105,7 @@ env.reset_from_xml_string(xml_string)  # Reset the environment with the desired
 ####
 
 ## Selection of the simulation parameters
-num_traj = 2  # Number of trajectories
+num_traj = 1  # Number of trajectories
 ee_pos = env._eef_xpos  # End-effector position (point from which the
 # approach trajectory starts)
 table_pos = env.sim.model.body_pos[1]  # Table position (point in which the

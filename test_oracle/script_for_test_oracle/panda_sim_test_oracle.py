@@ -417,25 +417,7 @@ print(f'The real mean square error is {mse}')
 mse_NN = (np.power(error_NN, 2)).mean()
 print(f'The mean square error of the prediction is {mse_NN}')
 
-max_xf = max(xd_vect_for_err_plot)
-# 3D plot of the real error
-plot_utils.plot_explored_space_3D(xd_vect_for_err_plot - max_xf,
-                                  vel_NN,
-                                  error,
-                                  elev=90,
-                                  azim=-90)
-# Plot of the real error along time
-plot_utils.plot_dataset_along_time(xd_vect_for_err_plot - max_xf, vel_NN, error)
-
-# 3D plot of the prediction error
-plot_utils.plot_explored_space_3D(xd_vect_for_err_plot - max_xf,
-                                  vel_NN,
-                                  sub_error,
-                                  elev=90,
-                                  azim=-90,
-                                  vmin=0)
-# Plot of the real error along time
-plot_utils.plot_dataset_along_time(xd_vect_for_err_plot - max_xf, vel_NN, sub_error)
+## PLOTS
 
 SDU.plot_torques()
 SDU.plot_ee_pos_vel()
@@ -455,5 +437,24 @@ plt.plot(steps, xc_vect_for_plot)
 plt.plot(steps, xd_vect_for_plot, 'b')
 plt.legend(['z_f', 'z_c', 'z_f+z_c'])
 plt.grid()
+
+# 3D plot of the real error
+plot_utils.plot_explored_space_3D(xd_vect_for_err_plot,
+                                  vel_NN,
+                                  error,
+                                  elev=90,
+                                  azim=-90)
+# Plot of the real error along time
+plot_utils.plot_dataset_along_time(xd_vect_for_err_plot, vel_NN, error)
+
+# 3D plot of the prediction error
+plot_utils.plot_explored_space_3D(xd_vect_for_err_plot,
+                                  vel_NN,
+                                  sub_error,
+                                  elev=90,
+                                  azim=-90,
+                                  vmin=0)
+# Plot of the prediction error along time
+plot_utils.plot_dataset_along_time(xd_vect_for_err_plot, vel_NN, sub_error)
 
 plt.show()

@@ -27,5 +27,5 @@ scipy==1.10.0
 termcolor==2.2.0
 tensorboard==2.11.2
 torch==1.13.1
-torchensemble==0.1.8
+torchensemble==0.1.3
 torchvision==0.14.1

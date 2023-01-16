@@ -334,6 +334,7 @@ class OperationalSpaceController(Controller):
         else:
             desired_pos = np.array(self.goal_pos)
 
+<<<<<<< HEAD
         # if self.interpolator_ori is not None:
         #     # relative orientation based on difference between current ori and ref
         #     self.relative_ori = orientation_error(self.ee_ori_mat, self.ori_ref)
@@ -366,6 +367,18 @@ class OperationalSpaceController(Controller):
 
         # Position
         # position_error = -desired_pos + self.pos_init + self.pos_imp_t
+=======
+        if self.iter == 3130:
+            a = 1
+
+        thresh = 2
+        self.force = [a_ - thresh if a_ > thresh else 0 for a_ in self.force]
+
+        acc_imp_t = np.zeros(3)
+        acc_imp_r = np.zeros(3)
+
+        # Position
+>>>>>>> 7ad2016c0b7d406d04b6d980e221735c6a7cc7aa
         position_error = self.ee_pos - desired_pos
         vel_pos_error = self.ee_pos_vel
 
@@ -373,11 +386,14 @@ class OperationalSpaceController(Controller):
                                        np.multiply(position_error, self.kp[0:3]) -
                                        np.multiply(vel_pos_error, self.kd[0:3]))
 
+<<<<<<< HEAD
         # self.vel_imp_t += acc_imp_t * self.dt
         # self.pos_imp_t += self.vel_imp_t * self.dt
 
         # vel_ori_error = -self.ee_ori_vel
 
+=======
+>>>>>>> 7ad2016c0b7d406d04b6d980e221735c6a7cc7aa
         # Rotation
         R_msr = self.ee_ori_mat  # actual orientation
         R_comp = np.linalg.inv(R_msr).dot(self.R_cmd)

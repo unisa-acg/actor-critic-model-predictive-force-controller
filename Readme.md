@@ -33,7 +33,7 @@ In order to install MuJoCo you need to:
 4. Add these lines to the `.bashrc` file:
 
    ```sh
-   export LD_LIBRARY_PATH=$HOME/username/.mujoco/mujoco210/bin #substitute username with your username
+   export LD_LIBRARY_PATH=$HOME/USERNAME/.mujoco/mujoco210/bin #substitute username with your username
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so
    export PATH="$LD_LIBRARY_PATH:$PATH"
@@ -78,22 +78,7 @@ You will need Pip for the virtual environment packages installation, venv for th
    apt install python3.8-venv
    ```
 
-### Setting up the virtual environment
-
-Create a [venv](https://linuxhint.com/python-virtualenv-tutorial/) and activate it
-
-```
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Install via pip the required packages into the virtual environment
-
-```
-python3 -m pip install -r requirements.txt
-```
-
-### Clone environment_identification
+### Clone the repository
 
 Clone environment_identification repository
 
@@ -101,6 +86,33 @@ Clone environment_identification repository
    cd
    git clone https://bitbucket.org/unisa-polimi-idsia/environment_identification/
    ```
+
+
+### Setting up the virtual environment
+
+Create a python [venv](https://linuxhint.com/python-virtualenv-tutorial/) and activate it
+
+```
+python3 -m venv venv --python=python3.8
+source venv/bin/activate
+```
+
+Install via pip the required packages into the virtual environment
+
+```
+cd environment_identification
+python3 -m pip install -r requirements.txt
+```
+
+### Substitute the base robosuite controllers
+
+Substitute the files ```base_controller.py``` and ```osc.py``` in robosuite:
+
+   ```sh
+   cp dataset_generation_utilities/osc.py /home/USERNAME/venv/lib/python3.8/site-packages/robosuite/controllers # substitute USERNAME with your user name
+   cp dataset_generation_utilities/base_controller.py /home/USERNAME/venv/lib/python3.8/site-packages/robosuite/controllers # substitute USERNAME with your user name
+   ```
+
 
 <!-- ### Clone robosuite
 

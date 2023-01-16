@@ -33,7 +33,7 @@ In order to install MuJoCo you need to:
 4. Add these lines to the `.bashrc` file:
 
    ```sh
-   export LD_LIBRARY_PATH=$HOME/USERNAME/.mujoco/mujoco210/bin #substitute username with your username
+   export LD_LIBRARY_PATH=$HOME/.mujoco/mujoco210/bin #substitute username with your username
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/nvidia #if nvidia graphic
    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libGLEW.so
    export PATH="$LD_LIBRARY_PATH:$PATH"
@@ -93,8 +93,8 @@ Clone environment_identification repository
 Create a python [venv](https://linuxhint.com/python-virtualenv-tutorial/) and activate it
 
 ```
-python3 -m venv venv --python=python3.8
-source venv/bin/activate
+python3 -m venv venv --python=python3.8 # Create the venv
+source venv/bin/activate # Activate the venv
 ```
 
 Install via pip the required packages into the virtual environment

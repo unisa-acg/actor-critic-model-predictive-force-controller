@@ -24,3 +24,8 @@ test_oracle/script_for_nn_training/sim_model_mod.xml
 test_oracle/script_for_nn_training/sim_model.xml
 test_oracle/script_for_dataset_generation/sim_model_mod.xml
 test_oracle/script_for_dataset_generation/sim_model.xml
+main_oracle/script_for_nn_training/logs
+main_oracle/script_for_nn_training/output
+main_oracle/script_for_test_oracle/output
+main_oracle/script_for_test_oracle/sim_model_mod.xml
+main_oracle/script_for_test_oracle/sim_model.xml

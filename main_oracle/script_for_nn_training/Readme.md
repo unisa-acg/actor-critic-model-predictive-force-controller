@@ -23,8 +23,8 @@ The simulation will generate three main outputs: the _logs_ folder, the _ouput_ 
 * The _logs_ folder contains the convergence data of the training;
 * The _ouput_ folder contains the trained E-NNs;
 * The figures represent:
-  1. the prediction of the E-NNs compared to the actual one, for the verification dataset;
-  2. the prediction error versus x_f and xf_dot (3d plot);
-  3. the prediction error versus x_f;
-  4. the prediction error versus xf_dot;
-  5. x_f versus xf_dot;
+    1. the prediction of the E-NNs compared to the actual one, for the verification dataset;
+    2. the prediction error versus x_f and xf_dot (3d plot);
+    3. the prediction error versus x_f;
+    4. the prediction error versus xf_dot;
+    5. x_f versus xf_dot;

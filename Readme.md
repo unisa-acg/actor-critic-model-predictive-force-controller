@@ -106,7 +106,7 @@ python3 -m pip install -r requirements.txt
 
 ### Substitute the base robosuite controllers
 
-Substitute the files ```base_controller.py``` and ```osc.py``` in robosuite:
+Substitute the files ```base_controller.py``` and ```osc.py``` in robosuite (substitute USERNAME with your user name in the command lines):
 
    ```sh
    cp dataset_generation_utilities/osc.py /home/USERNAME/venv/lib/python3.8/site-packages/robosuite/controllers # substitute USERNAME with your user name

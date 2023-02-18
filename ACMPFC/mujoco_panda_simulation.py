@@ -23,7 +23,7 @@ import os
 matplotlib.use('QtCairo')
 
 # Retrieve the distributions (mean,variance) from the ROS Param server
-z_ee_dist, zdot_ee_dist, fz_ee_dist, error_f_dist, u_dist = ACMPFC_utils.get_distribution_parameters(
+z_ee_dist, zdot_ee_dist, fz_ee_dist, error_f_dist, u_dist = ACMPFC_utils.get_distribution_parameters_lab(
 )
 
 

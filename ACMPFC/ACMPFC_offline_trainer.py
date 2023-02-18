@@ -120,7 +120,7 @@ class Trainer():
         self.initialize_subscribers()
         self.initialize_publishers()
 
-        self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters(
+        self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters_lab(
         )
 
         u_u = 0 # EXAMPLE DATA, substitute if needed

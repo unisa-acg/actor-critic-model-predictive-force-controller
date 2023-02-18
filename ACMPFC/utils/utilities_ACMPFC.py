@@ -59,10 +59,11 @@ def get_distribution_parameters_lab():
     distribution_dict = rospy.get_param('distribution_dict')
     z_ee_dist = distribution_dict['pos_z']
     zdot_ee_dist = distribution_dict['vel_z']
-    fz_ee_dist = distribution_dict['f_z']
-    x_f_dist = distribution_dict['x_f']
+    fz_ee_dist = distribution_dict['f_z_out']
+    error_f_dist = distribution_dict['e_f']
+    u_dist = distribution_dict['u']
     return tuple(np.float32(z_ee_dist)), tuple(np.float32(zdot_ee_dist)), tuple(
-        np.float32(fz_ee_dist)), tuple(np.float32(x_f_dist))
+        np.float32(fz_ee_dist)), tuple(np.float32(error_f_dist)) ,tuple(np.float32(u_dist))
 
 
 def get_distribution_parameters():

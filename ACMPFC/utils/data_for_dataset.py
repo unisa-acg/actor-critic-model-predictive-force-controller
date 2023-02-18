@@ -1,6 +1,5 @@
 import csv
 import os.path
-import quat_utils
 import numpy as np
 
 
@@ -28,6 +27,26 @@ class DataForDataset:
 
         self.ncalls_get_info_robot = 0
 
+    def mat2euler(mat):
+        """ Convert Rotation Matrix to Euler Angles. """
+        mat = np.asarray(mat, dtype=np.float64)
+        assert mat.shape[-2:] == (3, 3), "Invalid shape matrix {}".format(mat)
+
+        cy = np.sqrt(mat[..., 2, 2] * mat[..., 2, 2] +
+                    mat[..., 1, 2] * mat[..., 1, 2])
+        _FLOAT_EPS = np.finfo(np.float64).eps
+        _EPS4 = _FLOAT_EPS * 4.0
+        condition = cy > _EPS4
+        euler = np.empty(mat.shape[:-1], dtype=np.float64)
+        euler[...,
+            2] = np.where(condition, -np.arctan2(mat[..., 0, 1], mat[..., 0, 0]),
+                            -np.arctan2(-mat[..., 1, 0], mat[..., 1, 1]))
+        euler[..., 1] = np.where(condition, -np.arctan2(-mat[..., 0, 2], cy),
+                                -np.arctan2(-mat[..., 0, 2], cy))
+        euler[..., 0] = np.where(condition,
+                                -np.arctan2(mat[..., 1, 2], mat[..., 2, 2]), 0.0)
+        return euler
+
     def get_info_robot(self, env, bodies_name):
         """It extracts the useful data from the simulation
 
@@ -52,7 +71,7 @@ class DataForDataset:
             env.sim.data.site_xmat[env.sim.model.site_name2id(bodies_name)].reshape(
                 [3, 3]))
 
-        self.ee_ori[self.ncalls_get_info_robot, :] = quat_utils.mat2euler(self.ee_quat)
+        self.ee_ori[self.ncalls_get_info_robot, :] = self.mat2euler(self.ee_quat)
 
         self.ncalls_get_info_robot += 1
 

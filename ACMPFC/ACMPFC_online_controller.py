@@ -59,10 +59,10 @@ class ACMPFC():
         self.initialize_publishers()
 
         # Upload distribution params on ros server
-        norm_data_path = 'csv_data_franka/norm_data_sine_5_50_5_noD.csv'
+        norm_data_path = 'norm_data/norm_data_example.csv'
         ACMPFC_utils.set_distribution_parameters(norm_data_path)
         time.sleep(1.)
-        self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters(
+        self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters_lab(
         )
         ####
         u_u = 0 # EXAMPLE DATA, substitute if needed
@@ -70,11 +70,11 @@ class ACMPFC():
 
         mean_u = (u_u + u_l) / 2
         std_dev_u = (u_u - u_l) / 2
-        self.u_dist = (mean_u, std_dev_u)
+        #self.u_dist = (mean_u, std_dev_u) # Uncomment if you have your own environment (stiffness etc)
 
         mean_e_f = 0 # EXAMPLE DATA, substitute if needed
         std_dev_e_f = 13 # EXAMPLE DATA, substitute if needed
-        self.error_f_dist = (mean_e_f, std_dev_e_f)
+        #self.error_f_dist = (mean_e_f, std_dev_e_f) # Uncomment if you have your own environment (stiffness etc)
 
     # Instantiate the necessary subscribers and publishers to communicate with the simulation
     def initialize_subscribers_franka(self):

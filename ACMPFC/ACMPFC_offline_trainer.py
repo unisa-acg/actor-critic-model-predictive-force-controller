@@ -155,7 +155,7 @@ class Trainer():
 
         # Create the folder to store state dict
         cwd = os.getcwd()
-        main_save_folder_path = os.path.join(cwd, 'nn_state_dict_save_no_time')
+        main_save_folder_path = os.path.join(cwd, 'nn_state_dict_save')
 
         if os.path.exists(main_save_folder_path) is False:
             os.mkdir(main_save_folder_path)

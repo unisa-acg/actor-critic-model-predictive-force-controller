@@ -1,12 +1,13 @@
-# Environment Identification
+# Experimental validation of an Actor-Critic Model Predictive Force Controller for robot-environment interaction tasks
 
-This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought for students with the aim to provide an environment for the development of master theses projects and some research activities.
+This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought as a support and demonstration material for the homonymous paper.
 
 ## Getting Started
 
 This section explains how to setup the environment needed to launch the demos. First, MuJoCo needs to be installed, then some preliminary packages are required for the virtual environment creation.
 
 ### Install MuJoCo 2.1.0
+
 In order to install MuJoCo you need to:
 
 1. Create a hidden folder:
@@ -78,6 +79,8 @@ You will need Pip for the virtual environment packages installation, venv for th
    apt install python3.8-venv
    ```
 
+* [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu)
+  
 ### Clone the repository
 
 Clone environment_identification repository
@@ -149,7 +152,7 @@ Robosuite is a simulation framework powered by the MuJoCo physics engine that of
 
 ## Usage
 
-Refer to the Readme.md in the [Main](/main_oracle) folder.
+Refer to the Readme.md in the [ACMPFC](/ACMPFC) folder.
 
 <!-- ## List of Modules
 
@@ -172,4 +175,4 @@ Refer to the Readme.md in the [Main](/main_oracle) folder.
 * **Alessandro Pozzi** - [PoliMi](https://www.polimi.it/)
 * **Luca Puricelli** - [PoliMi](https://www.polimi.it/)
 
-[Back to top](#environment-identification)
+[Back to top](#experimental-validation-of-an-actor-critic-model-predictive-force-controller-for-robot-environment-interaction-tasks)

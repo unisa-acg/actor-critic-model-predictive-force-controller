@@ -10,26 +10,29 @@ import utils.utilities_ACMPFC as ACMPFC_utils
 import time
 
 
+# Instantiate the three neural networks models
 def neural_networks_instantiation(num_ensembles, Device):
-    # Instantiate the three neural networks models
+
+    # Actor
     actor = ACMPFC_utils.NeuralNetwork(num_inputs=4,
-                                      num_outputs=1,
-                                      num_hidden_layers=2,
-                                      num_hidden_neurons=300,
-                                      dropout_prob=0).to(Device)
+                                       num_outputs=1,
+                                       num_hidden_layers=2,
+                                       num_hidden_neurons=300,
+                                       dropout_prob=0).to(Device)
 
     # Critic
     critic = ACMPFC_utils.NeuralNetwork_Critic(num_inputs=1,
-                                              num_outputs=1,
-                                              num_hidden_layers=2,
-                                              num_hidden_neurons=128,
-                                              dropout_prob=0.1).to(Device)
+                                               num_outputs=1,
+                                               num_hidden_layers=2,
+                                               num_hidden_neurons=128,
+                                               dropout_prob=0.1).to(Device)
 
+    # Model approximator
     model_approximator = ACMPFC_utils.NeuralNetwork(num_inputs=4,
-                                                   num_outputs=3,
-                                                   num_hidden_layers=3,
-                                                   num_hidden_neurons=300,
-                                                   dropout_prob=0).to(device)
+                                                    num_outputs=3,
+                                                    num_hidden_layers=3,
+                                                    num_hidden_neurons=300,
+                                                    dropout_prob=0).to(device)
     return [actor, critic, model_approximator]
 
 
@@ -65,23 +68,24 @@ class ACMPFC():
         self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters_lab(
         )
         ####
-        u_u = 0 # EXAMPLE DATA, substitute if needed
-        u_l = -0.05 # EXAMPLE DATA, substitute if needed
+        u_u = 0  # EXAMPLE DATA, substitute if needed
+        u_l = -0.05  # EXAMPLE DATA, substitute if needed
 
         mean_u = (u_u + u_l) / 2
         std_dev_u = (u_u - u_l) / 2
         #self.u_dist = (mean_u, std_dev_u) # Uncomment if you have your own environment (stiffness etc)
 
-        mean_e_f = 0 # EXAMPLE DATA, substitute if needed
-        std_dev_e_f = 13 # EXAMPLE DATA, substitute if needed
+        mean_e_f = 0  # EXAMPLE DATA, substitute if needed
+        std_dev_e_f = 13  # EXAMPLE DATA, substitute if needed
         #self.error_f_dist = (mean_e_f, std_dev_e_f) # Uncomment if you have your own environment (stiffness etc)
 
     # Instantiate the necessary subscribers and publishers to communicate with the simulation
     def initialize_subscribers_franka(self):
-        
-        self.cartesian_position_sub = message_filters.Subscriber(
-            "/franka_ee_pose", PoseStamped, queue_size=1,
-            buff_size=2**20) 
+
+        self.cartesian_position_sub = message_filters.Subscriber("/franka_ee_pose",
+                                                                 PoseStamped,
+                                                                 queue_size=1,
+                                                                 buff_size=2**20)
         self.cartesian_velocity_sub = message_filters.Subscriber("/franka_ee_velocity",
                                                                  TwistStamped,
                                                                  queue_size=1,
@@ -138,7 +142,7 @@ class ACMPFC():
                 torch.from_numpy(state_aug_norm).to(
                     self.device).unsqueeze(0)).detach().cpu().numpy()
         u_msg = PointStamped()
-        u_msg.point.x = action_norm[0][0] * self.u_dist[1] + self.u_dist[0] 
+        u_msg.point.x = action_norm[0][0] * self.u_dist[1] + self.u_dist[0]
 
         delta = 1
         if self.u_old != 0:

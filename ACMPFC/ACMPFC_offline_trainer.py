@@ -16,9 +16,10 @@ from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
 
+# Instantiate the three neural networks models
 def neural_networks_instantiation(num_ensembles, Device):
-    # Actor
 
+    # Actor
     actor = ACMPFC_utils.NeuralNetwork(
         num_inputs=4,
         num_outputs=1,
@@ -28,22 +29,17 @@ def neural_networks_instantiation(num_ensembles, Device):
 
     # Critic
     critic = ACMPFC_utils.NeuralNetwork_Critic(num_inputs=2,
-                                              num_outputs=1,
-                                              num_hidden_layers=2,
-                                              num_hidden_neurons=128,
-                                              dropout_prob=0.1).to(Device)
+                                               num_outputs=1,
+                                               num_hidden_layers=2,
+                                               num_hidden_neurons=128,
+                                               dropout_prob=0.1).to(Device)
 
-    # critic = ACMPFC_utils.NeuralNetwork_Critic(num_inputs=6,
-    #                                           num_outputs=1,
-    #                                           num_hidden_layers=2,
-    #                                           num_hidden_neurons=128,
-    #                                           dropout_prob=0.1).to(Device)
-
+    # Model approximator
     model_approximator = ACMPFC_utils.NeuralNetwork(num_inputs=4,
-                                                   num_outputs=3,
-                                                   num_hidden_layers=3,
-                                                   num_hidden_neurons=300,
-                                                   dropout_prob=0).to(Device)
+                                                    num_outputs=3,
+                                                    num_hidden_layers=3,
+                                                    num_hidden_neurons=300,
+                                                    dropout_prob=0).to(Device)
 
     return [actor, critic, model_approximator]
 
@@ -60,29 +56,16 @@ class Trainer():
         self.counter_epochs = 0
         self.counter_sim = 0
         self.cem_counter = 0
-        # Store NNs
+
+        ## Store NNs and training activation/deactivation
+
+        # Actor
         self.actor = actor
         self.actor_loss = nn.MSELoss()
         self.learning_rate_actor = 1e-4
         self.actor_optim = torch.optim.Adam(self.actor.parameters(),
                                             lr=self.learning_rate_actor,
-                                            weight_decay=4e-5)  # best 1 e-4 and 4e-5
-
-        self.critic = critic
-        self.critic_loss = nn.MSELoss()  # nn.HuberLoss()
-        # self.critic_optim = torch.optim.SGD(self.critic.parameters(),
-        #                                     lr=1e-3,
-        #                                     momentum=0.9)  #weight_decay=4e-5)
-        self.critic_optim = torch.optim.Adam(self.critic.parameters(),
-                                             lr=1e-4,
-                                             weight_decay=4e-5)
-        self.critic_training = False
-        self.critic_load_dict = False
-        if self.critic_load_dict:
-            self.critic.load_state_dict(
-                torch.load('nn_state_dict_save_no_time/critic.pth'))
-
-            print('Critic state dict loaded!')
+                                            weight_decay=4e-5)
 
         self.actor_training = True
         self.actor_load_dict = False
@@ -91,6 +74,22 @@ class Trainer():
                 torch.load('nn_state_dict_save_no_time/actor.pth'))
             print('Actor state dict loaded!')
 
+        # Critic
+        self.critic = critic
+        self.critic_loss = nn.MSELoss()
+        self.critic_optim = torch.optim.Adam(self.critic.parameters(),
+                                             lr=1e-4,
+                                             weight_decay=4e-5)
+
+        self.critic_training = False
+        self.critic_load_dict = False
+        if self.critic_load_dict:
+            self.critic.load_state_dict(
+                torch.load('nn_state_dict_save_no_time/critic.pth'))
+
+            print('Critic state dict loaded!')
+
+        # Model approximator
         self.model_approximator = model_approximator
         self.model_approximator_loss = nn.MSELoss()
         self.model_approximator_optim = torch.optim.Adam(
@@ -123,15 +122,15 @@ class Trainer():
         self.z_ee_dist, self.zdot_ee_dist, self.fz_ee_dist, self.error_f_dist, self.u_dist = ACMPFC_utils.get_distribution_parameters_lab(
         )
 
-        u_u = 0 # EXAMPLE DATA, substitute if needed
+        u_u = 0  # EXAMPLE DATA, substitute if needed
         u_l = -0.05  # EXAMPLE DATA, substitute if needed
 
         mean_u = (u_u + u_l) / 2
         std_dev_u = (u_u - u_l) / 2
         self.u_dist = (mean_u, std_dev_u)
 
-        mean_e_f = 0 # EXAMPLE DATA, substitute if needed
-        std_dev_e_f = 13 # EXAMPLE DATA, substitute if needed
+        mean_e_f = 0  # EXAMPLE DATA, substitute if needed
+        std_dev_e_f = 13  # EXAMPLE DATA, substitute if needed
         self.error_f_dist = (mean_e_f, std_dev_e_f)
 
     def initialize_publishers(self):
@@ -209,12 +208,12 @@ class Trainer():
         error_f_norm = (error_f - self.error_f_dist[0]) / self.error_f_dist[1]
         u_norm = (u - self.u_dist[0]) / self.u_dist[1]
 
-        # Store state 
+        # Store state
         state_norm = np.array([pos_z_norm, vel_z_norm, f_z_norm])
         state_aug_norm = np.array([pos_z_norm, vel_z_norm, f_z_norm, error_f_norm])
         action_norm = u_norm
 
-        # If done, start training of last episode, 
+        # If done, start training of last episode,
         # else store one every five transition (100 Hz frequency of storage if Mujoco set to 500 Hz)
         if done == 1:
             self.publish_received()
@@ -293,9 +292,7 @@ class Trainer():
                     Q_np1 = self.critic.forward(input_critic_torch[i +
                                                                    1, :].unsqueeze(0))
 
-                    term_error_f = abs(input_critic_torch[
-                        i + 1,
-                        0])
+                    term_error_f = abs(input_critic_torch[i + 1, 0])
                     term_action1 = (input_critic_torch[i, 1])**2
                     term_action2 = abs(input_critic_torch[i, 1] -
                                        input_critic_torch[i - 1, 1])
@@ -306,7 +303,7 @@ class Trainer():
                     writer.add_scalar('Cost/term_force', term_error_f * c0, i)
                     writer.add_scalar('Cost/term_action1', term_action1 * c1, i)
                     writer.add_scalar('Cost/term_action2', term_action2 * c2, i)
-                    Q_bman = r + GAMMA * Q_np1  
+                    Q_bman = r + GAMMA * Q_np1
                     loss = self.critic_loss(Q_n, Q_bman)
                     loss.backward(retain_graph=True)
                     self.critic_optim.step()
@@ -349,7 +346,7 @@ class Trainer():
                     self.iter_batch_actor += 1
 
                 # Incremental epochs if target loss not reached
-                if loss > 2: # EXAMPLE DATA, change if needed
+                if loss > 2:  # EXAMPLE DATA, change if needed
                     if N_EPOCHS < 20:
                         N_EPOCHS += 1
 
@@ -382,15 +379,15 @@ class Trainer():
 
         # CEM details
         smoothing_rate = 0.95
-        iterations = 3  
+        iterations = 3
         num_elites = 4
         num_samples = 256
-        time_horizon = 5 
+        time_horizon = 5
         best_actions = []
-      
+
         # Threshold
-        ll_u = -1  
-        ul_u = 1  
+        ll_u = -1
+        ul_u = 1
 
         for i in range(num_states):
 
@@ -401,12 +398,11 @@ class Trainer():
             for _ in range(iterations):
 
                 reward_sum = np.zeros((num_samples, 1))
-                
+
                 # Draw random samples from a normal (Gaussian) distribution
                 u_samples = np.random.normal(loc=mu_matrix_u,
                                              scale=std_matrix_u,
                                              size=(num_samples, time_horizon))
-
 
                 u_samples[u_samples >= ul_u] = ul_u
                 u_samples[u_samples <= ll_u] = ll_u
@@ -440,10 +436,11 @@ class Trainer():
                             self.error_f_dist[0]) / self.error_f_dist[1]
                         c_error = 1
                         action = u_samples_torch[:, t].detach().cpu().numpy()
-                        c_state = (10-self.cem_counter)/10
-                        z_next = state_tp1[:,0].detach().cpu().numpy()
-                        z = state_action_norm_t[:,0].detach().cpu().numpy()
-                        reward = c_error * abs(state_tp1_error_force_norm.detach().cpu().numpy()) + c_state * abs(z_next - z)
+                        c_state = (10 - self.cem_counter) / 10
+                        z_next = state_tp1[:, 0].detach().cpu().numpy()
+                        z = state_action_norm_t[:, 0].detach().cpu().numpy()
+                        reward = c_error * abs(state_tp1_error_force_norm.detach().cpu(
+                        ).numpy()) + c_state * abs(z_next - z)
                         action_tm1 = action
                     reward_sum = np.add(reward_sum, np.expand_dims(reward, axis=1))
 
@@ -452,7 +449,7 @@ class Trainer():
                 elites_idx = sorted(range(len(reward_sum_list)),
                                     key=lambda i: reward_sum_list[i])[:num_elites]
 
-                elites_costs = reward_sum[elites_idx] 
+                elites_costs = reward_sum[elites_idx]
 
                 elites_u = u_samples[elites_idx, :]
                 mu_matrix_u_new = np.sum(elites_u, axis=0) / num_elites
@@ -496,8 +493,9 @@ class Trainer():
 
 if __name__ == '__main__':
     device = 'cuda'
-    actor, critic, ensemble = neural_networks_instantiation(num_ensembles=3,
-                                                            Device=device) # For simulation, due to low noise an ensemble can be superflous 
+    actor, critic, ensemble = neural_networks_instantiation(
+        num_ensembles=3,
+        Device=device)  # For simulation, due to low noise an ensemble can be superflous
     trainer = Trainer(actor, critic, ensemble, device)
     print('[Trainer] Trainer running')
     rospy.spin()

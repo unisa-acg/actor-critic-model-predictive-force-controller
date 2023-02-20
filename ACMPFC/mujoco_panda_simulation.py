@@ -2,17 +2,17 @@ import robosuite as suite
 from robosuite.controllers import load_controller_config
 import numpy as np
 from datetime import datetime
-import utils.quat_utils as quat_utils
-import utils.utilities_ACMPFC as ACMPFC_utils
-from utils.utilities_ACMPFC import modify_XML
+import ACMPFC.utils.quat_utils as quat_utils
+import ACMPFC.utils.utilities_ACMPFC as ACMPFC_utils
+from ACMPFC.utils.utilities_ACMPFC import modify_XML
 import time
 import matplotlib.pyplot as plt
 import matplotlib
-from utils.trajectory_generator import TrajectoryGenerator
-from utils.trajectory_resampler import TrajectoryResampler
-from utils.data_processing import DataProcessing
-from utils.sim_data_utilities import SimulationDataUtilities
-from utils.data_for_dataset import DataForDataset
+from ACMPFC.utils.trajectory_generator import TrajectoryGenerator
+from ACMPFC.utils.trajectory_resampler import TrajectoryResampler
+from ACMPFC.utils.data_processing import DataProcessing
+from ACMPFC.utils.sim_data_utilities import SimulationDataUtilities
+from ACMPFC.utils.data_for_dataset import DataForDataset
 import csv
 from geometry_msgs.msg import PoseStamped, PointStamped, WrenchStamped, TwistStamped
 import rospy
@@ -20,6 +20,7 @@ from std_msgs.msg import Bool
 import torch.nn as nn
 import torch
 import os
+
 matplotlib.use('QtCairo')
 
 # Retrieve the distributions (mean,variance) from the ROS Param server
@@ -77,22 +78,22 @@ def plot_traj():
 def neural_networks_instantiation(num_ensembles, Device):
     # Instantiate the three neural networks models
     actor = ACMPFC_utils.NeuralNetwork(num_inputs=4,
-                                      num_outputs=2,
-                                      num_hidden_layers=2,
-                                      num_hidden_neurons=300,
-                                      dropout_prob=0.1).to(Device)
+                                       num_outputs=2,
+                                       num_hidden_layers=2,
+                                       num_hidden_neurons=300,
+                                       dropout_prob=0.1).to(Device)
 
     critic = ACMPFC_utils.NeuralNetwork_Critic(num_inputs=1,
-                                              num_outputs=1,
-                                              num_hidden_layers=2,
-                                              num_hidden_neurons=128,
-                                              dropout_prob=0.1).to(Device)
+                                               num_outputs=1,
+                                               num_hidden_layers=2,
+                                               num_hidden_neurons=128,
+                                               dropout_prob=0.1).to(Device)
 
     model_approximator = ACMPFC_utils.NeuralNetwork(num_inputs=4,
-                                                   num_outputs=3,
-                                                   num_hidden_layers=3,
-                                                   num_hidden_neurons=300,
-                                                   dropout_prob=0).to(Device)
+                                                    num_outputs=3,
+                                                    num_hidden_layers=3,
+                                                    num_hidden_neurons=300,
+                                                    dropout_prob=0).to(Device)
 
     return [actor, critic, model_approximator]
 
@@ -103,6 +104,7 @@ model_approximator_loss = nn.MSELoss()
 model_approximator_optim = torch.optim.Adam(model_approximator.parameters(),
                                             lr=1e-3,
                                             weight_decay=4e-5)
+
 
 # Function to add the boundary marker in the renderization
 def add_markers_op_zone(env, params_randomizer, table_pos_z):
@@ -174,8 +176,9 @@ D_list = []
 u_list = []
 counter = 0
 
+
 class RosNode:
-    # Instantiate all the required publishers and subscribers 
+    # Instantiate all the required publishers and subscribers
     def __init__(self, name):
         rospy.init_node(name)
         rospy.loginfo("Starting MuJoCo")
@@ -341,9 +344,8 @@ for i in range(num_traj):
     ####TOLTI ATTRITI
     env.sim.model.geom_solref[7][0] = 0.2
     env.sim.model.geom_solref[30][0] = 0.2
-    env.sim.model.geom_friction[7] = [0.0, 0.005,
-                                      0.0001]  
-    env.sim.model.geom_friction[30] = [0.0, 0.005, 0.0001] 
+    env.sim.model.geom_friction[7] = [0.0, 0.005, 0.0001]
+    env.sim.model.geom_friction[30] = [0.0, 0.005, 0.0001]
 
     #traj building
     traj_approach = np.stack(
@@ -407,26 +409,19 @@ for i in range(num_traj):
                 write = csv.writer(f)
                 write.writerow([f_d])
 
-            f_e = env.sim.data.sensordata[2] 
-
-            #Force controller
-            x_f = FC.force_controller(f_d, f_e, dt)
-
-            vel_real.append(vel_along_z)
-            steps.append(ii)
-            x_f_plot.append(target_traj[ii, 2] + x_f)
+            f_e = env.sim.data.sensordata[2]
 
         if flag == 1:
             traj = np.array(
                 [target_traj[ii, 0], target_traj[ii, 1], target_traj[ii, 2]])
-            kp_pos = 500 
+            kp_pos = 500
             kp_ori = 50
             kp_z = 500
             KP = np.array([kp_pos, kp_pos, kp_z, kp_ori, kp_ori, kp_ori])
 
         else:
             traj = np.array(target_traj[ii, :])
-            kp_pos = 500  
+            kp_pos = 500
             kp_ori = 50
             kp_z = 500
             KP = np.array([kp_pos, kp_pos, kp_z, kp_ori, kp_ori, kp_ori])
@@ -473,9 +468,7 @@ for i in range(num_traj):
                 if only_force == True:
                     pass
                 else:
-                    action[8] = target_traj[
-                        ii,
-                        2] + u 
+                    action[8] = target_traj[ii, 2] + u
                     action_for_five = u
 
         ### STORE DATA TO CSV
@@ -504,9 +497,11 @@ for i in range(num_traj):
                     msg_pose.pose.position.z = pos_along_z  # Pos z
                     msg_vel.twist.linear.z = vel_along_z  # Vel z
                     msg_wrench.wrench.force.z = env.sim.data.sensordata[2]  # Force z
-                    msg_error_f.wrench.force.z = env.sim.data.sensordata[2] - force_ref[ii]
+                    msg_error_f.wrench.force.z = env.sim.data.sensordata[2] - force_ref[
+                        ii]
                     msg_done.point.x = 0
-                    mujoco_node.publish(msg_pose, msg_wrench, msg_vel, msg_error_f, msg_done)
+                    mujoco_node.publish(msg_pose, msg_wrench, msg_vel, msg_error_f,
+                                        msg_done)
                 print('Threshold force')
                 break
 
@@ -535,7 +530,7 @@ for i in range(num_traj):
         std_dev_vel_z = np.std(vel_z_csv)
         std_dev_f_smooth = np.std(f_smoothed_csv)
         std_dev_u = np.std(action_list_csv)
-        std_dev_error_f = np.std(error_f_csv) 
+        std_dev_error_f = np.std(error_f_csv)
 
         means = [mean_pos_z, mean_vel_z, mean_f_smooth, mean_u, mean_error_f]
         std_devs = [

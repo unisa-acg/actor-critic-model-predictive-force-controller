@@ -27,14 +27,12 @@ The following lines will launch the test simulation and output the result of the
     cd environment_identification
     source set_env.sh
     cd ACMPFC
-    python3 ACMPFC_online_controller.py
     python3 mujoco_panda_simulation.py
 ```
 
 ## Expected output of test ACMPFC
 
-The simulation will generate two main outputs: eleven figures and two .csv files.
-The figures represent:
+The simulation will generate ... figures, which represents:
 
 1. the generated trajectory followed by the end-effector along the _x_ and _y_-axis;
 2. the generated force followed by the end-effector along the _z_-axis;
@@ -49,8 +47,3 @@ The figures represent:
 11. the prediction error along time;
 
 These graphs provide graphical display tools that may or may not be used.
-
-The .csv files are contained in the folder _output_, divided into two subfolders:
-
-* _traj_generated_csv_: store the generated trajectories (one file per trajectory)
-* _traj_resampled_csv_: store the resampled trajectories (one file per trajectory)

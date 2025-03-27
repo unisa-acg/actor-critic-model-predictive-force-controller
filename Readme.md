@@ -1,6 +1,6 @@
 # Experimental validation of an Actor-Critic Model Predictive Force Controller for robot-environment interaction tasks
 
-This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought as a support and demonstration material for the homonymous paper.
+This repository collects the work conducted by a collaboration between UniSa, PoliMi and IDSIA. The repository is thought as a support and demonstration material for the [homonymous paper](http://dx.doi.org/10.5220/0012160700003543).
 
 ## Getting Started
 
@@ -162,6 +162,36 @@ Refer to the Readme.md in the [ACMPFC](/ACMPFC) folder.
 | [Trajectory Generation](/trajectory_generation) | Provide a pipeline to retrieve customizable 2D trajectories, keeping track of the various steps through .csv files. |
 | [Dataset Generation](/dataset_generation) | Provide a module to retrieve the useful data from the simulations and process them in oder to generate a .csv dataset able to train a neural network. |
 | [Main](/main) | Contains the main scripts used for this repository. | -->
+
+## Citation
+
+If you find this code useful, please cite our work as:
+
+```bibtex
+@inproceedings{Pozzi_2023_ACMPFC,  
+  title     = {Experimental Validation of an Actor-Critic Model Predictive Force Controller for Robot-Environment Interaction Tasks},  
+  author    = {Pozzi, Alessandro and Puricelli, Luca and Petrone, Vincenzo and Ferrentino, Enrico and Chiacchio, Pasquale and Braghin, Francesco and Roveda, Loris},  
+  booktitle = {Proceedings of the 20th International Conference on Informatics in Control, Automation and Robotics},  
+  year      = {2023},  
+  pages     = {394--404},  
+  publisher = {SCITEPRESS - Science and Technology Publications},  
+  doi       = {10.5220/0012160700003543},  
+  url       = {http://dx.doi.org/10.5220/0012160700003543}  
+}
+```
+
+If you want to cite this repo:
+
+```bibtex
+@software{Pozzi_Experimental_Validation_of_2023,
+   author = {Pozzi, Alessandro and Puricelli, Luca and Petrone, Vincenzo and Ferrentino, Enrico and Chiacchio, Pasquale and Braghin, Francesco and Roveda, Loris},
+   license = {BSD-3-Clause},
+   month = feb,
+   title = {{Experimental Validation of an Actor-Critic Model Predictive Force Controller for Robot-Environment Interaction Tasks}},
+   url = {https://github.com/unisa-acg/actor-critic-model-predictive-force-controller},
+   year = {2023}
+}
+```
 
 ## Authors
 

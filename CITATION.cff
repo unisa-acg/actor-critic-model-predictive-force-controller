@@ -1,0 +1,91 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Experimental Validation of an Actor-Critic Model
+  Predictive Force Controller for Robot-Environment
+  Interaction Tasks
+message: 'Related paper: http://dx.doi.org/10.5220/0012160700003543'
+type: software
+authors:
+  - given-names: Alessandro
+    family-names: Pozzi
+    email: alessandro11.pozzi@mail.polimi.it
+    affiliation: Politecnico di Milano
+    orcid: 'https://orcid.org/0000-0002-6460-4669'
+  - given-names: Luca
+    family-names: Puricelli
+    email: luca.puricelli@mail.polimi.it
+    affiliation: Politecnico di Milano
+    orcid: 'https://orcid.org/0000-0003-1736-0822'
+  - given-names: Vincenzo
+    family-names: Petrone
+    email: vipetrone@unisa.it
+    affiliation: University of Salerno
+    orcid: 'https://orcid.org/0000-0003-4777-1761'
+  - given-names: Enrico
+    family-names: Ferrentino
+    email: eferrentino@unisa.it
+    affiliation: University of Salerno
+    orcid: 'https://orcid.org/0000-0003-0768-8541'
+  - given-names: Pasquale
+    family-names: Chiacchio
+    email: pchiacchio@unisa.it
+    affiliation: University of Salerno
+    orcid: 'https://orcid.org/0000-0003-3385-8866'
+  - given-names: Francesco
+    family-names: Braghin
+    email: francesco.braghin@polimi.it
+    affiliation: Politecnico di Milano
+    orcid: 'https://orcid.org/0000-0002-0476-4118'
+  - given-names: Loris
+    family-names: Roveda
+    email: loris.roveda@supsi.ch
+    affiliation: IDSIA USI-SUPSI
+    orcid: 'https://orcid.org/0000-0002-4427-536X'
+identifiers:
+  - type: doi
+    value: 10.5220/0012160700003543
+    description: >-
+      Related paper published in In Proceedings of the 20th
+      International Conference on Informatics in Control,
+      Automation and Robotics (ICINCO 2023) - Volume 1,
+      pages 394-404
+repository-code: >-
+  https://github.com/unisa-acg/actor-critic-model-predictive-force-controller
+url: 'https://www.youtube.com/watch?v=7ysG4lz5lVY'
+abstract: >-
+  In industrial settings, robots are typically employed to
+  accurately track a reference force to exert on the sur-
+  rounding environment to complete interaction tasks.
+  Interaction controllers are typically used to achieve this
+  goal. Still, they either require manual tuning, which
+  demands a significant amount of time, or exact modeling of
+  the environment the robot will interact with, thus
+  possibly failing during the actual application. A
+  significant advancement in this area would be a
+  high-performance force controller that does not need
+  operator calibration and is quick to be deployed in any
+  scenario. With this aim, this paper proposes an
+  Actor-Critic Model Pre- dictive Force Controller (ACMPFC),
+  which outputs the optimal setpoint to follow in order to
+  guarantee force tracking, computed by continuously trained
+  neural networks. This strategy is an extension of a
+  reinforcement learning-based one, born in the context of
+  human-robot collaboration, suitably adapted to
+  robot-environment interaction. We validate the ACMPFC in a
+  real-case scenario featuring a Franka Emika Panda robot.
+  Com- pared with a base force controller and a
+  learning-based approach, the proposed controller yields a
+  reduction of the force tracking MSE, attaining fast
+  convergence: with respect to the base force controller,
+  ACMPFC reduces the MSE by a factor of 4.35.
+keywords:
+  - physical robot-environment interaction
+  - artificial neural networks
+  - optimized interaction control
+  - impedance control
+license: BSD-3-Clause
+commit: e84fa08bc299a7add0d0e2501469937fbecf66ba
+date-released: '2023-02-20'
